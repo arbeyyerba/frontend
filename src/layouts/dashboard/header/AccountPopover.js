@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Web3Button } from '@web3modal/react';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
@@ -28,6 +29,7 @@ const MENU_OPTIONS = [
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
   const account = useAccountProfile()
+console.log("account:", account)
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -39,8 +41,7 @@ export default function AccountPopover() {
 
   return (
     <>
-      <IconButton
-        onClick={handleOpen}
+      <Box
         sx={{
           p: 0,
           ...(open && {
@@ -56,10 +57,8 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <div>
-        {account.icon}
-    </div>
-      </IconButton>
+          <Web3Button/>
+      </Box>
 
       <Popover
         open={Boolean(open)}

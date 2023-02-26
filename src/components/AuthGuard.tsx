@@ -1,21 +1,26 @@
-import { useAccount } from 'wagmi';
-import { PropsWithChildren } from 'react';
 import { Button } from '@mui/material';
 import { Web3Button } from '@web3modal/react';
+import dynamic from 'next/dynamic';
+import { PropsWithChildren } from 'react';
+import { useAccount } from 'wagmi';
 
 
 
 // ----------------------------------------------------------------------
 
-export default function AuthGuard({children}: PropsWithChildren) {
+export function DynamicAuthGuard({children}: PropsWithChildren) {
   const {isConnected, address} = useAccount();
 
-  if (isConnected) {
-    return <>{children}</>
-  } else {
-    return (
-    <>
-    <Web3Button />
-    </>);
-  }
+  return (
+    <div suppressHydrationWarning>
+      {isConnected?
+       children
+      :(
+          <Web3Button />
+       )}
+    </div>
+  )
 }
+
+const AuthGuard = dynamic(() => Promise.resolve(DynamicAuthGuard), {ssr: false});
+export default AuthGuard

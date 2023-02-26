@@ -2,7 +2,17 @@ import { Helmet } from 'react-helmet-async';
 import { faker } from '@faker-js/faker';
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography, Button } from '@mui/material';
+
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import Container from '@mui/material/Container';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 // components
 import Iconify from '../components/iconify';
 // sections
@@ -24,10 +34,13 @@ import { ContractFactory, ethers } from 'ethers';
 import { useSigner } from 'wagmi';
 import Profile from '../contracts/Profile.json';
 import Authorizer from '../contracts/Authorizer.json';
-import { dispatch } from 'src/redux/store';
-import { addAuthorizerAddress, loadUserProfileContractAddress } from 'src/redux/slices/contracts';
+import { dispatch, useSelector } from 'src/redux/store';
+import { addAuthorizerAddress, loadUserProfileContractAddress, addWellKnownAuthorizer } from 'src/redux/slices/contracts';
 import useUserProfileContract from 'src/hooks/useUserProfileContract';
 import useAuthorizerContracts from 'src/hooks/useAuthorizerContracts';
+import { useEffect } from 'react'
+import { parseAnvilChainData } from 'src/utils/parseAnvilState'
+
 
 
 // ----------------------------------------------------------------------
@@ -37,6 +50,15 @@ export default function DashboardAppPage() {
   console.log('signer status', signer, isError, isLoading, status, isIdle);
   const contract = useUserProfileContract();
   const authorizers = useAuthorizerContracts();
+  const profile = useSelector((state) => state.contracts.userProfile);
+
+  useEffect(() => {
+    const data = parseAnvilChainData();
+    data.authorizers.forEach(authorizer => {
+      dispatch(addWellKnownAuthorizer(authorizer));
+    })
+  }, [contract]);
+
 
   const deployContract = async () => {
     console.log('deploying contract...')
@@ -64,8 +86,8 @@ export default function DashboardAppPage() {
 
   const addAttestation = async () => {
     console.log('attesting on contract...')
-    if (signer && contract && authorizers.length > 0) {
-        await contract.connect(signer).attest(authorizers[0].address, "this is me, making a statement.")
+    if (signer && contract && profile.authorizers.length > 0) {
+        await contract.connect(signer).attest(profile.authorizers[0].address, "this is me, making a statement.")
     } else {
       console.log('no signer/contract/authorizer??', signer,contract,authorizers);
     }
@@ -84,6 +106,11 @@ export default function DashboardAppPage() {
           Hi, Welcome back
         </Typography>
 
+
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={12} md={12}>
+            <Paper>
+              <Stack alignItems="center">
         {contract ?
            authorizers.length > 0 ?
         <Button onClick={addAttestation} variant='outlined' sx={{m:1}}>
@@ -98,23 +125,12 @@ export default function DashboardAppPage() {
           Deploy my Contract
         </Button>
         }
+              </Stack>
 
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:android-filled'} />
+            </Paper>
+
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="New Users" total={1352831} color="info" icon={'ant-design:apple-filled'} />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Item Orders" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
-          </Grid>
         </Grid>
       </Container>
     </DashboardLayout>

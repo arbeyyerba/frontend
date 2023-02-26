@@ -3,8 +3,6 @@ import { useEffect } from 'react';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
-// mock
-import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
@@ -12,6 +10,8 @@ import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 import navConfig from './config';
+import useAccountProfile from 'src/hooks/useAccountProfile';
+import { Web3Button } from '@web3modal/react';
 
 // ----------------------------------------------------------------------
 
@@ -35,6 +35,7 @@ Nav.propTypes = {
 export default function Nav({ openNav, onCloseNav }) {
   const pathname = ''
   const isDesktop = useResponsive('up', 'lg');
+  const account = useAccountProfile();
 
   useEffect(() => {
     if (openNav) {
@@ -57,17 +58,7 @@ export default function Nav({ openNav, onCloseNav }) {
       <Box sx={{ mb: 5, mx: 2.5 }}>
         <Link underline="none">
           <StyledAccount>
-            <Avatar src={account.photoURL} alt="photoURL" />
-
-            <Box sx={{ ml: 2 }}>
-              <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {account.displayName}
-              </Typography>
-
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {account.role}
-              </Typography>
-            </Box>
+            <Web3Button/>
           </StyledAccount>
         </Link>
       </Box>

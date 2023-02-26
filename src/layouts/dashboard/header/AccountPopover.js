@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Web3Button } from '@web3modal/react';
 // @mui
 import { alpha } from '@mui/material/styles';
-import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
+import { Box, Divider, Typography, Stack, MenuItem,  Popover } from '@mui/material';
 import useAccountProfile from 'src/hooks/useAccountProfile';
 // mocks_
 //import account from '../../../_mock/account';
@@ -31,9 +30,9 @@ export default function AccountPopover() {
   const account = useAccountProfile()
 console.log("account:", account)
 
-  const handleOpen = (event) => {
-    setOpen(event.currentTarget);
-  };
+  // const handleOpen = (event) => {
+  //   setOpen(event.currentTarget);
+  // };
 
   const handleClose = () => {
     setOpen(null);
@@ -57,7 +56,7 @@ console.log("account:", account)
           }),
         }}
       >
-          <Web3Button/>
+          
       </Box>
 
       <Popover

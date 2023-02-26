@@ -23,5 +23,3 @@ metamask as normal
 3. search for 'localhost'
 4. change the "chain ID" to 31337 (seems to be the default for anvil? does this change for others?)
 5. switch to the 'localhost' network you just setup. You should see 10000ETH in your wallet if you did it right.
-
-

@@ -1,49 +1,28 @@
 import { Helmet } from 'react-helmet-async';
-import { faker } from '@faker-js/faker';
 // @mui
-import { useTheme } from '@mui/material/styles';
 
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
-import Stepper from '@mui/material/Stepper';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 // components
-import Iconify from '../components/iconify';
-// sections
-import {
-  AppTasks,
-  // AppNewsUpdate,
-  // AppOrderTimeline,
-  // AppCurrentVisits,
-  // AppWebsiteVisits,
-  // AppTrafficBySite,
-  AppWidgetSummary,
-  // AppCurrentSubject,
-  // AppConversionRates,
-} from '../sections/@dashboard/app';
-import DashboardLayout from 'src/layouts/dashboard/DashboardLayout';
-import AuthGuard from 'src/components/AuthGuard';
-import useWalletAddress from 'src/hooks/useWallet';
-import { ContractFactory, ethers } from 'ethers';
+import DashboardLayout from '../layouts/dashboard/DashboardLayout';
+import AuthGuard from '../components/AuthGuard';
+import { ContractFactory } from 'ethers';
 import { useSigner } from 'wagmi';
-import Profile from '../contracts/Profile.json';
-import Authorizer from '../contracts/Authorizer.json';
-import { dispatch, useSelector } from 'src/redux/store';
-import { addAuthorizerAddress, loadUserProfileContractAddress, addWellKnownAuthorizer } from 'src/redux/slices/contracts';
-import useUserProfileContract from 'src/hooks/useUserProfileContract';
-import useAuthorizerContracts from 'src/hooks/useAuthorizerContracts';
+
+import { dispatch, useSelector } from '../redux/store';
+import { addAuthorizerAddress, loadUserProfileContractAddress, addWellKnownAuthorizer } from '../redux/slices/contracts';
+import useUserProfileContract from '../hooks/useUserProfileContract';
+import useAuthorizerContracts from '../hooks/useAuthorizerContracts';
 import { useEffect } from 'react'
-import { parseAnvilChainData } from 'src/utils/parseAnvilState'
-
-
-
+import { parseAnvilChainData } from '../utils/parseAnvilState';
 // ----------------------------------------------------------------------
+// have to require import of JSON files 
+const Authorizer = require('../contracts/Authorizer.json');
+const Profile = require('../contracts/Profile.json');
 
 export default function DashboardAppPage() {
   const { data: signer, isError, isLoading, status, isIdle } = useSigner();
@@ -86,7 +65,7 @@ export default function DashboardAppPage() {
 
   const addAttestation = async () => {
     console.log('attesting on contract...')
-    if (signer && contract && profile.authorizers.length > 0) {
+    if (signer && contract && profile && profile.authorizers.length > 0) {
         await contract.connect(signer).attest(profile.authorizers[0].address, "this is me, making a statement.")
     } else {
       console.log('no signer/contract/authorizer??', signer,contract,authorizers);
@@ -96,44 +75,44 @@ export default function DashboardAppPage() {
   return (
     <>
       <AuthGuard>
-      <DashboardLayout>
-      <Helmet>
-        <title> Dashboard | Minimal UI </title>
-      </Helmet>
+        <DashboardLayout>
+          <Helmet>
+            <title> Arbery | Own your reputation. </title>
+          </Helmet>
 
-      <Container maxWidth="xl">
-        <Typography variant="h4" sx={{ mb: 5 }}>
-          Hi, Welcome back
-        </Typography>
+          <Container maxWidth="xl">
+            <Typography variant="h4" sx={{ mb: 5 }}>
+              Hi, Welcome to Arbey
+            </Typography>
 
 
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={12} md={12}>
-            <Paper>
-              <Stack alignItems="center">
-        {contract ?
-           authorizers.length > 0 ?
-        <Button onClick={addAttestation} variant='outlined' sx={{m:1}}>
-          Make an attestation
-        </Button>
-                                :
-        <Button onClick={addAuthorizer} variant='outlined' sx={{m:1}}>
-          Deploy a new authorizer
-        </Button>
-         :
-        <Button onClick={deployContract} variant='outlined' sx={{m:1}}>
-          Deploy my Contract
-        </Button>
-        }
-              </Stack>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={12} md={12}>
+                <Paper>
+                  <Stack alignItems="center">
+            {contract ?
+              authorizers.length > 0 ?
+            <Button onClick={addAttestation} variant='outlined' sx={{m:1}}>
+              Make an attestation
+            </Button>
+                                    :
+            <Button onClick={addAuthorizer} variant='outlined' sx={{m:1}}>
+              Deploy a new authorizer
+            </Button>
+            :
+            <Button onClick={deployContract} variant='outlined' sx={{m:1}}>
+              Deploy my Contract
+            </Button>
+            }
+                  </Stack>
 
-            </Paper>
+                </Paper>
 
-          </Grid>
+              </Grid>
 
-        </Grid>
-      </Container>
-    </DashboardLayout>
+            </Grid>
+          </Container>
+        </DashboardLayout>
       </AuthGuard>
     </>
   );

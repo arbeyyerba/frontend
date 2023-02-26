@@ -4,7 +4,6 @@ import { styled } from '@mui/material/styles';
 //
 import Header from './header';
 import Nav from './nav';
-import { PropsWithChildren } from 'react';
 
 // ----------------------------------------------------------------------
 

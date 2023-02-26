@@ -150,9 +150,9 @@ export default function BlogPostCard({ post, index }) {
           </StyledTitle>
 
           <StyledInfo>
-            {POST_INFO.map((info, index) => (
+            {POST_INFO.map((info, i) => (
               <Box
-                key={index}
+                key={i}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',

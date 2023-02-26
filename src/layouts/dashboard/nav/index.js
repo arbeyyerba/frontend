@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
-import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
+import { Box, Link, Button, Drawer, Typography, Stack } from '@mui/material';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
@@ -10,7 +10,6 @@ import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 import navConfig from './config';
-import useAccountProfile from 'src/hooks/useAccountProfile';
 import { Web3Button } from '@web3modal/react';
 
 // ----------------------------------------------------------------------
@@ -35,13 +34,10 @@ Nav.propTypes = {
 export default function Nav({ openNav, onCloseNav }) {
   const pathname = ''
   const isDesktop = useResponsive('up', 'lg');
-  const account = useAccountProfile();
-
   useEffect(() => {
     if (openNav) {
       onCloseNav();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   const renderContent = (
@@ -58,7 +54,7 @@ export default function Nav({ openNav, onCloseNav }) {
       <Box sx={{ mb: 5, mx: 2.5 }}>
         <Link underline="none">
           <StyledAccount>
-            <Web3Button/>
+            <Web3Button />
           </StyledAccount>
         </Link>
       </Box>

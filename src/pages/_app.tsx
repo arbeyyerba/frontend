@@ -3,11 +3,9 @@ import { HelmetProvider } from 'react-helmet-async';
 import ThemeProvider from '../theme';
 // components
 import { Web3Modal } from '@web3modal/react';
-import App, { AppContext, AppProps } from 'next/app';
+import { AppProps } from 'next/app';
 import { store } from 'src/redux/store';
-import { infuraProvider } from 'wagmi/providers/infura';
-import { StyledChart } from '..//components/chart';
-import ScrollToTop from '..//components/scroll-to-top';
+
 
 // scroll bar
 import { Provider as ReduxProvider } from 'react-redux';
@@ -15,13 +13,15 @@ import 'simplebar/src/simplebar.css';
 
 import { EthereumClient } from '@web3modal/ethereum';
 import * as React from 'react';
-import { chains, client, walletConnectProjectId } from 'src/utils/wagmi';
+import { chains, client } from 'src/utils/wagmi';
 import { WagmiConfig } from 'wagmi';
 
 const ethereumClient = new EthereumClient(client, chains)
 
 
 // ----------------------------------------------------------------------
+
+const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '';
 
 export default function MyApp(props: AppProps) {
   const { Component, pageProps} = props

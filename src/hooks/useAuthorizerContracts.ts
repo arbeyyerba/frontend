@@ -6,12 +6,12 @@ import { Authorizer } from 'src/redux/slices/contracts';
 
 
 export default function useAuthorizerContracts() {
-  const state = useSelector((state: RootState)=>state.contracts);
+  const authorizerState = useSelector((state: RootState)=>state.contracts);
   const contract = useMemo(()=>{
-    return state.wellKnownAuthorizers.map((authorizer: Authorizer)=>{
+    return authorizerState.wellKnownAuthorizers.map((authorizer: Authorizer)=>{
     return new Contract(authorizer.address, AuthorizerContract.abi);
     })
-  }, [state.authorizerAddresses]);
+  }, [authorizerState.authorizerAddresses]);
 
   return contract;
 }

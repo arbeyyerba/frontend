@@ -1,5 +1,5 @@
-import { Authorizer } from 'src/redux/slices/contracts'
-import anvilChainData from './anvilChainData.json'
+import { Authorizer } from '../redux/slices/contracts'
+const anvilChainData = require('./anvilChainData.json')
 
 
 export interface AnvilChainData {
@@ -8,9 +8,9 @@ export interface AnvilChainData {
 
 export function parseAnvilChainData() {
   const authorizerAddresses = anvilChainData.transactions
-    .filter((txn) => txn.transactionType == "CREATE")
-    .filter((txn) => txn.contractName == "EmployerDAO")
-    .map((txn) => txn.contractAddress)
+    .filter((txn: any) => txn.transactionType == "CREATE")
+    .filter((txn: any ) => txn.contractName == "EmployerDAO")
+    .map((txn: any) => txn.contractAddress)
 
   return {
     authorizers: [

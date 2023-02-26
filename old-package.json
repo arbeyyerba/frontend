@@ -6,8 +6,8 @@
   "private": true,
   "scripts": {
     "lint": "next lint",
-    "lint:es": "eslint --ext .ts,.tsx .",
-    "lint:fix": "eslint --fix --ext .ts,.tsx .",
+    "lint:es": "eslint --ext .ts,.tsx, .js, .jsx .",
+    "lint:fix": "eslint --fix --ext .ts,.tsx, .js, .jsx .",
     "dev": "next dev",
     "start": "next start",
     "build": "next build",

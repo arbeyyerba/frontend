@@ -1,4 +1,3 @@
-import { Button } from '@mui/material';
 import { Web3Button } from '@web3modal/react';
 import dynamic from 'next/dynamic';
 import { PropsWithChildren } from 'react';
@@ -9,7 +8,7 @@ import { useAccount } from 'wagmi';
 // ----------------------------------------------------------------------
 
 export function DynamicAuthGuard({children}: PropsWithChildren) {
-  const {isConnected, address} = useAccount();
+  const {isConnected} = useAccount();
 
   return (
     <div suppressHydrationWarning>

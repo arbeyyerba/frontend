@@ -1,6 +1,6 @@
 import { modalConnectors, walletConnectProvider } from '@web3modal/ethereum'
 import { configureChains, createClient } from 'wagmi'
-import { goerli, mainnet, localhost } from 'wagmi/chains'
+import { goerli, mainnet, localhost, polygonMumbai, polygon } from 'wagmi/chains'
 
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 console.log(process.env);
@@ -11,7 +11,7 @@ if (walletConnectProjectId === undefined) {
 const anvilLocalhost = {...localhost, id: 31337};
 
 const { chains, provider, webSocketProvider } = configureChains(
-  [mainnet, ...(process.env.NODE_ENV === 'development' ? [goerli, localhost, anvilLocalhost] : [])],
+  [mainnet, polygonMumbai, goerli, polygon,  ...(process.env.NODE_ENV === 'development' ? [goerli, localhost, anvilLocalhost] : [])],
   [walletConnectProvider({ projectId: walletConnectProjectId })],
 )
 

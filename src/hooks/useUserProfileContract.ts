@@ -7,12 +7,12 @@ import Profile from 'src/contracts/Profile.json';
 export default function useUserProfileContract() {
   const contractState = useSelector((state: RootState)=>state.contracts);
   const contract = useMemo(()=>{
-  if (contractState.userProfileContractAddress) {
-    return new Contract(contractState.userProfileContractAddress, Profile.abi);
+  if (contractState.userProfile) {
+    return new Contract(contractState.userProfile.address, Profile.abi);
   } else {
     return undefined
   }
-  }, [contractState.userProfileContractAddress]);
+  }, [contractState.userProfile]);
 
   return contract;
 }

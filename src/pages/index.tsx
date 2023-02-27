@@ -1,23 +1,22 @@
 import { Helmet } from 'react-helmet-async';
 // @mui
 
-import Grid from '@mui/material/Grid';
-import Container from '@mui/material/Container';
-import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 // components
-import DashboardLayout from '../layouts/dashboard/DashboardLayout';
-import AuthGuard from '../components/AuthGuard';
 import { ContractFactory } from 'ethers';
+import { useEffect } from 'react';
+import useUserProfileContract from 'src/hooks/useUserProfileContract';
+import { addAuthorizerAddressToProfile, addWellKnownAuthorizer, newUserProfile } from 'src/redux/slices/contracts';
+import { dispatch, useSelector } from 'src/redux/store';
 import { useSigner } from 'wagmi';
-
-import { dispatch, useSelector } from '../redux/store';
-import { addAuthorizerAddress, loadUserProfileContractAddress, addWellKnownAuthorizer } from '../redux/slices/contracts';
-import useUserProfileContract from '../hooks/useUserProfileContract';
+import AuthGuard from '../components/AuthGuard';
 import useAuthorizerContracts from '../hooks/useAuthorizerContracts';
-import { useEffect } from 'react'
+import DashboardLayout from '../layouts/dashboard/DashboardLayout';
 import { parseAnvilChainData } from '../utils/parseAnvilState';
 // ----------------------------------------------------------------------
 // have to require import of JSON files 
@@ -26,10 +25,12 @@ const Profile = require('../contracts/Profile.json');
 
 export default function DashboardAppPage() {
   const { data: signer, isError, isLoading, status, isIdle } = useSigner();
+  const state = useSelector(state => state)
   console.log('signer status', signer, isError, isLoading, status, isIdle);
   const contract = useUserProfileContract();
   const authorizers = useAuthorizerContracts();
   const profile = useSelector((state) => state.contracts.userProfile);
+  console.log(state, 'contract:', contract)
 
   useEffect(() => {
     const data = parseAnvilChainData();
@@ -44,7 +45,8 @@ export default function DashboardAppPage() {
     if (signer) {
       const contractFactory = new ContractFactory(Profile.abi, Profile.bytecode, signer);
       const instance = await contractFactory.connect(signer).deploy();
-      dispatch(loadUserProfileContractAddress(instance.address));
+      dispatch(newUserProfile(instance.address));
+      console.log('done.');
     } else {
       console.log('no signer??');
     }
@@ -57,7 +59,8 @@ export default function DashboardAppPage() {
       const instance = await contractFactory.connect(signer).deploy(true);
       // TODO make the user click another button to 'add' the new authorizer..
       await contract.connect(signer).addAuthorizer(instance.address);
-      dispatch(addAuthorizerAddress(instance.address));
+      dispatch(addAuthorizerAddressToProfile(instance.address));
+      console.log('done.');
     } else {
       console.log('no signer/contract?', signer, contract);
     }
@@ -67,6 +70,7 @@ export default function DashboardAppPage() {
     console.log('attesting on contract...')
     if (signer && contract && profile && profile.authorizers.length > 0) {
         await contract.connect(signer).attest(profile.authorizers[0].address, "this is me, making a statement.")
+      console.log('done.');
     } else {
       console.log('no signer/contract/authorizer??', signer,contract,authorizers);
     }
@@ -90,20 +94,20 @@ export default function DashboardAppPage() {
               <Grid item xs={12} sm={12} md={12}>
                 <Paper>
                   <Stack alignItems="center">
-            {contract ?
-              authorizers.length > 0 ?
-            <Button onClick={addAttestation} variant='outlined' sx={{m:1}}>
-              Make an attestation
-            </Button>
-                                    :
-            <Button onClick={addAuthorizer} variant='outlined' sx={{m:1}}>
-              Deploy a new authorizer
-            </Button>
-            :
-            <Button onClick={deployContract} variant='outlined' sx={{m:1}}>
-              Deploy my Contract
-            </Button>
-            }
+                    {contract ?
+                      profile && profile.authorizers.length > 0 ?
+                    <Button onClick={addAttestation} variant='outlined' sx={{m:1}}>
+                      Make an attestation
+                    </Button>
+                                            :
+                    <Button onClick={addAuthorizer} variant='outlined' sx={{m:1}}>
+                      Deploy a new authorizer
+                    </Button>
+                    :
+                    <Button onClick={deployContract} variant='outlined' sx={{m:1}}>
+                      Deploy my Contract
+                    </Button>
+                    }
                   </Stack>
 
                 </Paper>

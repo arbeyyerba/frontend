@@ -10,6 +10,8 @@ if (walletConnectProjectId === undefined) {
 }
 const anvilLocalhost = {...localhost, id: 31337};
 
+console.log(process.env.NODE_ENV);
+
 const { chains, provider, webSocketProvider } = configureChains(
   [mainnet, polygonMumbai, goerli, polygon,  ...(process.env.NODE_ENV === 'development' ? [goerli, localhost, anvilLocalhost] : [])],
   [walletConnectProvider({ projectId: walletConnectProjectId })],

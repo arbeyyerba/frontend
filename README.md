@@ -11,7 +11,7 @@
 anvil
 ```
 
-### setup default chain state
+### setup default chain state (optional??)
 
 setup polygon RPC and api keys in the .env file. ex:
 
@@ -30,14 +30,6 @@ run the foundry script to setup the state to a default, known, state, with sever
 forge script script/Profile.s.sol:ProfileScript --fork-url http://localhost:8545 --b
 roadcast --json
 ```
-
-and then copy the transactions into the front-end folder, so we can import the data from it. Ideally, in prod/mainnet we would hardcode the list of known contract addresses somewhere else... but this works great for testing!
-
-```sh
-cp contracts/broadcast/Profile.s.sol/3117/run-latest.json ${path-to-frontend}/src/utils/
-```
-
-(note: there should be no need to copy the run-latest.json file every time you restart the chain. Only when something changes with the setup script. in otherwords, you only need to copy it after pulling changes from the contract repo)
 
 ### import one of anvil's accounts into metamask
 

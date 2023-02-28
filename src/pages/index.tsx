@@ -11,13 +11,13 @@ import Typography from '@mui/material/Typography';
 import { ContractFactory } from 'ethers';
 import { useEffect } from 'react';
 import useUserProfileContract from 'src/hooks/useUserProfileContract';
-import { addAuthorizerAddressToProfile, addWellKnownAuthorizer, newUserProfile } from 'src/redux/slices/contracts';
+import { addAuthorizerAddressToProfile, loadUserProfileData} from 'src/redux/slices/contracts';
 import { dispatch, useSelector } from 'src/redux/store';
-import { useSigner } from 'wagmi';
+import { useProvider, useSigner } from 'wagmi';
 import AuthGuard from '../components/AuthGuard';
 import useAuthorizerContracts from '../hooks/useAuthorizerContracts';
 import DashboardLayout from '../layouts/dashboard/DashboardLayout';
-import { parseAnvilChainData } from '../utils/parseAnvilState';
+import { useCookies } from 'react-cookie';
 // ----------------------------------------------------------------------
 // have to require import of JSON files 
 const Authorizer = require('../contracts/Authorizer.json');
@@ -25,19 +25,20 @@ const Profile = require('../contracts/Profile.json');
 
 export default function DashboardAppPage() {
   const { data: signer, isError, isLoading, status, isIdle } = useSigner();
-  const state = useSelector(state => state)
+  const provider = useProvider();
   console.log('signer status', signer, isError, isLoading, status, isIdle);
-  const contract = useUserProfileContract();
-  const authorizers = useAuthorizerContracts();
+  const profileContract = useUserProfileContract();
+  const contract = profileContract?.contract;
+  const wellKnownAuthorizers = useAuthorizerContracts();
   const profile = useSelector((state) => state.contracts.userProfile);
-  console.log(state, 'contract:', contract)
+  const [cookies, setCookie] = useCookies(['profile_address']);
 
   useEffect(() => {
-    const data = parseAnvilChainData();
-    data.authorizers.forEach(authorizer => {
-      dispatch(addWellKnownAuthorizer(authorizer));
-    })
-  }, [contract]);
+    if (cookies['profile_address']) {
+      dispatch(loadUserProfileData(cookies['profile_address'], provider));
+    }
+  }, [cookies]);
+
 
 
   const deployContract = async () => {
@@ -45,8 +46,11 @@ export default function DashboardAppPage() {
     if (signer) {
       const contractFactory = new ContractFactory(Profile.abi, Profile.bytecode, signer);
       const instance = await contractFactory.connect(signer).deploy();
-      dispatch(newUserProfile(instance.address));
-      console.log('done.');
+      console.log('instance', instance);
+      await instance.deployTransaction.wait(1);
+      setCookie('profile_address', instance.address);
+      dispatch(loadUserProfileData(instance.address, provider));
+        console.log('done.');
     } else {
       console.log('no signer??');
     }
@@ -56,9 +60,11 @@ export default function DashboardAppPage() {
     console.log('deploying dummy authorizer contract...')
     if (signer && contract) {
       const contractFactory = new ContractFactory(Authorizer.abi, Authorizer.bytecode, signer);
-      const instance = await contractFactory.connect(signer).deploy(true);
+      const instance = await contractFactory.connect(signer).deploy();
       // TODO make the user click another button to 'add' the new authorizer..
-      await contract.connect(signer).addAuthorizer(instance.address);
+      const txn = profileContract.addAuthorizer(signer, instance.address);
+      await instance.deployTransaction.wait(1);
+      console.log('txn', txn);
       dispatch(addAuthorizerAddressToProfile(instance.address));
       console.log('done.');
     } else {
@@ -69,12 +75,19 @@ export default function DashboardAppPage() {
   const addAttestation = async () => {
     console.log('attesting on contract...')
     if (signer && contract && profile && profile.authorizers.length > 0) {
-        await contract.connect(signer).attest(profile.authorizers[0].address, "this is me, making a statement.")
+      await profileContract.attest(signer, profile.authorizers[0].address, "this is me, making a statement.")
       console.log('done.');
     } else {
-      console.log('no signer/contract/authorizer??', signer,contract,authorizers);
+      console.log('no signer/contract/authorizer??', signer,contract,wellKnownAuthorizers);
     }
   };
+
+
+  const refreshChainData = async () => {
+    if (contract) {
+      dispatch(loadUserProfileData(contract.address, provider));
+    }
+  }
 
   return (
     <>
@@ -94,6 +107,9 @@ export default function DashboardAppPage() {
               <Grid item xs={12} sm={12} md={12}>
                 <Paper>
                   <Stack alignItems="center">
+                    <Button onClick={refreshChainData} variant='outlined' sx={{m:1}}>
+                      Refresh Data from Chain
+                    </Button>
                     {contract ?
                       profile && profile.authorizers.length > 0 ?
                     <Button onClick={addAttestation} variant='outlined' sx={{m:1}}>
@@ -111,7 +127,31 @@ export default function DashboardAppPage() {
                   </Stack>
 
                 </Paper>
+              </Grid>
 
+              <Grid item xs={12} sm={12} md={12}>
+                <Paper>
+                    <Typography variant="h2">
+                      Authorizers on your profile:
+                    </Typography>
+                  {profile && profile.authorizers.map((authorizer) => (<>
+                    <Typography>
+                      {authorizer.address} : {authorizer.description}
+                    </Typography>
+                </>))}
+                </Paper>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12}>
+                <Paper>
+                    <Typography variant="h2">
+                      Attestations on your profile:
+                    </Typography>
+                  {profile && profile.attestations.map((authorizer) => (<>
+                    <Typography>
+                      authorizer: {authorizer.authorizerAddress} message: {authorizer.message}
+                    </Typography>
+                </>))}
+                </Paper>
               </Grid>
 
             </Grid>

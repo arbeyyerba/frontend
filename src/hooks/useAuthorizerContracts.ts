@@ -11,7 +11,7 @@ export default function useAuthorizerContracts() {
     return authorizerState.wellKnownAuthorizers.map((authorizer: Authorizer)=>{
     return new Contract(authorizer.address, AuthorizerContract.abi);
     })
-  }, [authorizerState.authorizerAddresses]);
+  }, [authorizerState.wellKnownAuthorizers]);
 
   return contract;
 }

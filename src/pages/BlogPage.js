@@ -20,6 +20,8 @@ const SORT_OPTIONS = [
 export default function BlogPage() {
   return (
     <>
+    <AuthGuard>
+      <DashboardLayout>
       <Helmet>
         <title> Dashboard: Blog | Minimal UI </title>
       </Helmet>
@@ -45,6 +47,8 @@ export default function BlogPage() {
           ))}
         </Grid>
       </Container>
+      </DashboardLayout>
+      </AuthGuard>
     </>
   );
 }

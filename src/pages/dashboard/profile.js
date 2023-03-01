@@ -148,6 +148,8 @@ export default function UserPage() {
 
   return (
     <>
+      <AuthGuard>
+      <DashboardLayout>
       <Helmet>
         <title> User | Minimal UI </title>
       </Helmet>
@@ -289,6 +291,8 @@ export default function UserPage() {
           Delete
         </MenuItem>
       </Popover>
+      </DashboardLayout>
+      </AuthGuard>
     </>
   );
 }

@@ -22,6 +22,8 @@ export default function ProductsPage() {
 
   return (
     <>
+    <AuthGuard>
+      <DashboardLayout>
       <Helmet>
         <title> Dashboard: Products | Minimal UI </title>
       </Helmet>
@@ -45,6 +47,8 @@ export default function ProductsPage() {
         <ProductList products={PRODUCTS} />
         <ProductCartWidget />
       </Container>
+      </DashboardLayout>
+      </AuthGuard>
     </>
   );
 }

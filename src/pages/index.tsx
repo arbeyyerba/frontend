@@ -18,6 +18,8 @@ import AuthGuard from '../components/AuthGuard';
 import useAuthorizerContracts from '../hooks/useAuthorizerContracts';
 import DashboardLayout from '../layouts/dashboard/DashboardLayout';
 import { useCookies } from 'react-cookie';
+import dbConnect from 'src/utils/dbUtils';
+import { AuthorizerModel, ProfileModel } from 'src/utils/dbExports';
 // ----------------------------------------------------------------------
 // have to require import of JSON files 
 const Authorizer = require('../contracts/Authorizer.json');
@@ -50,7 +52,9 @@ export default function DashboardAppPage() {
       await instance.deployTransaction.wait(1);
       setCookie('profile_address', instance.address);
       dispatch(loadUserProfileData(instance.address, provider));
-        console.log('done.');
+      await dbConnect();
+      await ProfileModel.create({address: instance.address});
+      console.log('done.');
     } else {
       console.log('no signer??');
     }
@@ -67,6 +71,9 @@ export default function DashboardAppPage() {
       console.log('txn', txn);
       dispatch(addAuthorizerAddressToProfile(instance.address));
       console.log('done.');
+      await dbConnect();
+      await AuthorizerModel.create({address: instance.address, 
+        transaction: txn, name: 'dummy authorizer'});
     } else {
       console.log('no signer/contract?', signer, contract);
     }

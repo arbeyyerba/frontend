@@ -107,6 +107,10 @@ export default function DashboardAppPage() {
               <Grid item xs={12} sm={12} md={12}>
                 <Paper>
                   <Stack alignItems="center">
+
+                    <Button onClick={deployContract} variant='outlined' sx={{m:1}}>
+                      Deploy my Contract
+                    </Button>
                     <Button onClick={refreshChainData} variant='outlined' sx={{m:1}}>
                       Refresh Data from Chain
                     </Button>
@@ -120,9 +124,7 @@ export default function DashboardAppPage() {
                       Deploy a new authorizer
                     </Button>
                     :
-                    <Button onClick={deployContract} variant='outlined' sx={{m:1}}>
-                      Deploy my Contract
-                    </Button>
+                    <></>
                     }
                   </Stack>
 
@@ -146,11 +148,16 @@ export default function DashboardAppPage() {
                     <Typography variant="h2">
                       Attestations on your profile:
                     </Typography>
-                  {profile && profile.attestations.map((authorizer) => (<>
-                    <Typography>
-                      authorizer: {authorizer.authorizerAddress} message: {authorizer.message}
+                  {profile && profile.authorizers.map((authorizer) => (<>
+                    <Typography variant="h3">
+                      authorizer: {authorizer.address}
                     </Typography>
-                </>))}
+                  {profile && profile.attestations[authorizer.address].map((attestation) => (
+                    <Typography>
+                      message: {attestation.message}
+                    </Typography>
+                  ))}
+                  </>))}
                 </Paper>
               </Grid>
 

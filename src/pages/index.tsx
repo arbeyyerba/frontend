@@ -82,6 +82,8 @@ export default function DashboardAppPage() {
     }
   };
 
+  const funcArray = [deployContract, addAuthorizer, addAttestation];
+
 
   const refreshChainData = async () => {
     if (contract) {
@@ -94,7 +96,7 @@ export default function DashboardAppPage() {
       <AuthGuard>
         <DashboardLayout>
           <Helmet>
-            <title> Arbery | Own your reputation. </title>
+            <title> Abrey | Own your reputation. </title>
           </Helmet>
 
           <Container maxWidth="xl">

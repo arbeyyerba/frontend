@@ -13,13 +13,13 @@ const anvilLocalhost = {...localhost, id: 31337};
 console.log(process.env.NODE_ENV);
 
 const { chains, provider, webSocketProvider } = configureChains(
-  [mainnet, polygonMumbai, goerli, polygon,  ...(process.env.NODE_ENV === 'development' ? [goerli, localhost, anvilLocalhost] : [])],
+  [polygonMumbai, goerli, polygon, mainnet, ...(process.env.NODE_ENV === 'development' ? [polygonMumbai, goerli, localhost, anvilLocalhost] : [])],
   [walletConnectProvider({ projectId: walletConnectProjectId })],
 )
 
 export const client = createClient({
   autoConnect: true,
-  connectors: modalConnectors({ appName: 'My wagmi + Web3Modal App', chains }),
+  connectors: modalConnectors({ appName: 'Abrey', chains }),
   provider,
   webSocketProvider,
 })

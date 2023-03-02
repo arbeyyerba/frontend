@@ -52,11 +52,9 @@ export default function Nav({ openNav, onCloseNav }) {
       </Box>
 
       <Box sx={{ mb: 5, mx: 2.5 }}>
-        <Link underline="none">
-          <StyledAccount>
-            <Web3Button />
+          <StyledAccount alignItems='center'>
+            <Web3Button width='100%'/>
           </StyledAccount>
-        </Link>
       </Box>
 
       <NavSection data={navConfig} />
@@ -67,22 +65,12 @@ export default function Nav({ openNav, onCloseNav }) {
         <Stack alignItems="center" spacing={3} sx={{ pt: 5, borderRadius: 2, position: 'relative' }}>
           <Box
             component="img"
-            src="/assets/illustrations/illustration_avatar.png"
+            src="/assets/illustrations/github-mark.png"
             sx={{ width: 100, position: 'absolute', top: -50 }}
           />
 
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography gutterBottom variant="h6">
-              Get more?
-            </Typography>
-
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              From only $69
-            </Typography>
-          </Box>
-
-          <Button href="https://material-ui.com/store/items/minimal-dashboard/" target="_blank" variant="contained">
-            Upgrade to Pro
+          <Button href="https://www.github.com/" target="_blank" variant="contained">
+            Check Out Our EIP Draft
           </Button>
         </Stack>
       </Box>

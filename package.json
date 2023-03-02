@@ -33,7 +33,7 @@
     "history": "^5.3.0",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
-    "mongoose": "^6.7.0",
+    "mongoose": "^6.5.0",
     "next": "^13.2.1",
     "next-auth": "^4.10.3",
     "numeral": "^2.0.6",

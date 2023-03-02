@@ -34,8 +34,11 @@ export const dbConnect = async () => {
   return connection;
 };
 
+import { Attestation } from 'src/schemas/Attestation'
+import { Profile } from 'src/schemas/Profile'
+import { Authorizer } from 'src/schemas/Authorizer'
+import { getModelForClass } from '@typegoose/typegoose'
 
-export default dbConnect
-
-
-
+export const AuthorizerModel = getModelForClass(Authorizer);
+export const ProfileModel = getModelForClass(Profile);
+export const AttestationModel = getModelForClass(Attestation);

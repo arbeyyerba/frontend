@@ -18,8 +18,7 @@ import AuthGuard from '../components/AuthGuard';
 import useAuthorizerContracts from '../hooks/useAuthorizerContracts';
 import DashboardLayout from '../layouts/dashboard/DashboardLayout';
 import { useCookies } from 'react-cookie';
-import dbConnect from 'src/utils/dbUtils';
-import { AuthorizerModel, ProfileModel } from 'src/utils/dbExports';
+import {dbConnect, AuthorizerModel, ProfileModel} from 'src/utils/dbUtils';
 // ----------------------------------------------------------------------
 // have to require import of JSON files 
 const Authorizer = require('../contracts/Authorizer.json');

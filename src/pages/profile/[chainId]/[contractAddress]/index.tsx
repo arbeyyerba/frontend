@@ -1,17 +1,15 @@
 import { Helmet } from 'react-helmet-async';
 // @mui
 
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 // components
 import { useEffect } from 'react';
 import useUserProfileContract from 'src/hooks/useUserProfileContract';
 import {  loadUserProfileData} from 'src/redux/slices/contracts';
 import { dispatch, useSelector } from 'src/redux/store';
-import { useNetwork, useProvider, useSigner } from 'wagmi';
+import { useProvider, useSigner } from 'wagmi';
 import AuthGuard from 'src/components/AuthGuard';
 import DashboardLayout from 'src/layouts/dashboard/DashboardLayout';
 import { useRouter } from 'next/router';
@@ -43,11 +41,11 @@ export default function ProfilePage() {
 
  
 
-  const refreshChainData = async () => {
-    if (contract) {
-      dispatch(loadUserProfileData(contract.address, chainId, provider));
-    }
-  }
+    /* const refreshChainData = async () => {
+  *   if (contract) {
+  *     dispatch(loadUserProfileData(contract.address, chainId, provider));
+  *   }
+  * } */
 
   return (
     <>
@@ -59,9 +57,7 @@ export default function ProfilePage() {
         <ProfileHeader />
 
           <Container maxWidth="xl">
-            {profile && profile.authorizers.length === 0 ? (
-              <AuthorizersList />
-            ) : (
+            {profile && profile.authorizers.length > 0 && (
               <>
                 <MakePost />
               <Grid item xs={12} sm={12} md={12}>
@@ -69,8 +65,12 @@ export default function ProfilePage() {
               </Grid>
               </>
             )}
-            <Typography variant='h3' align='center'>
-              More groups to join
+            <Typography variant='h3' align='center' color="secondary">
+              {profile && profile.authorizers.length == 0 ?
+                "Join a group to get started"
+              :
+                "More groups to join"
+              }
             </Typography>
             <AuthorizersList />
           </Container>

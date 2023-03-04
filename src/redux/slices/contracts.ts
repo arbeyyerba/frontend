@@ -1,11 +1,11 @@
 import { Provider } from '@ethersproject/abstract-provider'
-import { formLabelClasses } from '@mui/material'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { createSlice } from '@reduxjs/toolkit'
 import { getProfileByOwnerAddressAndChainId } from 'src/lib/api'
+import { LensContract } from 'src/types/lensContract'
 import { ProfileContract } from 'src/types/profileContract'
 import authorizersMock from 'src/_mock/authorizers'
-import { AppDispatch, dispatch, RootState } from '../store'
+import { AppDispatch, dispatch as appDispatch, RootState } from '../store'
 
 export interface Authorizer {
   address: string,
@@ -25,11 +25,20 @@ export interface ProfileContractState {
   avatar?: string,
 }
 
+export interface ProfileMetadata {
+  name?: string,
+  avatar?: string,
+  profileAddress?: string,
+  lens?: boolean,
+}
+
 
 export interface ContractsState {
   userProfile: ProfileContractState | undefined,
   wellKnownAuthorizers: Authorizer[],
   loadedProfileFromDb: boolean,
+  knownProfiles: Record<string, ProfileMetadata>,
+  loadingProfiles: Record<string, boolean>,
 }
 
 export interface Attestation {
@@ -44,6 +53,9 @@ const initialState: ContractsState = {
   userProfile: undefined,
   wellKnownAuthorizers: [],
   loadedProfileFromDb: false,
+  knownProfiles: {},
+  loadingProfiles: {},
+
 }
 
 export const contractsSlice = createSlice({
@@ -100,14 +112,21 @@ export const contractsSlice = createSlice({
         state.userProfile.attestations[action.payload.group].push(action.payload.post)
       }
     },
+
+    loadingProfileMetadata: (state, action: PayloadAction<{address: string, loading: boolean}>) => {
+      state.loadingProfiles[action.payload.address] = action.payload.loading;
+    },
+    loadProfileMetadata: (state, action: PayloadAction<{address: string, metadata: ProfileMetadata}>) => {
+      state.knownProfiles[action.payload.address] = action.payload.metadata;
+    },
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { loadUserProfile, addPost, removeAuthorizerAddressFromProfile, loadedFromDb, addAttestations, addAuthorizerAddressToProfile, addWellKnownAuthorizer } = contractsSlice.actions
+export const { loadUserProfile, loadingProfileMetadata, loadProfileMetadata, addPost, removeAuthorizerAddressFromProfile, loadedFromDb, addAttestations, addAuthorizerAddressToProfile, addWellKnownAuthorizer } = contractsSlice.actions
 
 export function loadUserProfileData(address: string, chainId:string, provider: Provider) {
-  return async (dispatch: AppDispatch, getState: ()=>RootState) => {
+  return async (dispatch: AppDispatch) => {
     console.log('loading profile data', address, chainId, provider);
     const contract = new ProfileContract(address, chainId);
     console.log('fetching chain data...');
@@ -116,7 +135,7 @@ export function loadUserProfileData(address: string, chainId:string, provider: P
     const network = await provider.getNetwork();
     const profileMetadata = await contract.fetchMetadata(provider);
     const hydratedAuthorizers = authorizers.map((authorizer)=>{
-      const wellKnown = authorizersMock[chainId].find((mock)=>mock.address == authorizer.address);
+      const wellKnown = authorizersMock[chainId].find((mock)=>mock.address.toLowerCase() == authorizer.address.toLowerCase());
       console.log('wellknown', authorizer, authorizersMock, wellKnown);
       if (wellKnown) {
         return {
@@ -130,6 +149,13 @@ export function loadUserProfileData(address: string, chainId:string, provider: P
           ...authorizer
         }
       }
+    })
+
+    // TODO for each attestation, dispatch a fetch for
+    authorizers.forEach((authorizer) => {
+      attestations[authorizer.address].forEach((post) => {
+        dispatch(fetchProfileMetadata(post.senderAddress, chainId, provider));
+      })
     })
 
       // // TODO need to map attestations to whether they are valid or not...
@@ -158,6 +184,31 @@ export function initializeUserProfile(ownerAddress: `0x${string}`, chainId:strin
       dispatch(loadUserProfileData(dbProfile.profile.contractAddress, chainId, provider));
     }
     dispatch(loadedFromDb(true));
+  }
+}
+
+export function fetchProfileMetadata(address: string, chainId: string,  provider: Provider) {
+  console.log('fetching metadata for ', address);
+  appDispatch(loadingProfileMetadata({address, loading: true}));
+  return async (dispatch: AppDispatch) => {
+    const dbProfile = await getProfileByOwnerAddressAndChainId({ownerAddress: address as any, chainId});
+    const lensData = await LensContract.getLensData(provider, address);
+    if (lensData) {
+      console.log('found lens profile', lensData);
+      dispatch(loadProfileMetadata({address, metadata: {
+        name: lensData.handle,
+        avatar: lensData.avatar,
+        lens: true,
+      }}));
+    } if (dbProfile && dbProfile.profile) {
+      console.log('found profile', dbProfile.profile);
+      dispatch(loadProfileMetadata({address, metadata: {
+        name: dbProfile.profile.name,
+        avatar: dbProfile.profile.avatar,
+        profileAddress: dbProfile.profile.profileAddress,
+      }}));
+    }
+  dispatch(loadingProfileMetadata({address, loading: false}));
   }
 }
 

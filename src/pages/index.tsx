@@ -71,9 +71,9 @@ export default function DemoPage() {
 
   useEffect(() => {
     console.log('checking if we can reroute');
-      /* if (profileLoaded && profile) {
-  *     router.push(`/profile/${chainId}/${profile.address}`);
-  * } */
+    if (profileLoaded && profile) {
+          router.push(`/profile/${chainId}/${profile.address}`);
+    }
   }, [profileLoaded])
 
   const allStepsCompleted = (nextCompleted: boolean[]): boolean => {

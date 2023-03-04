@@ -6,6 +6,8 @@ import Iconify from '../components/iconify';
 import { BlogPostCard, BlogPostsSort, BlogPostsSearch } from '../sections/@dashboard/blog';
 // mock
 import POSTS from '../_mock/blog';
+import AuthGuard from 'src/components/AuthGuard';
+import DashboardLayout from 'src/layouts/dashboard/DashboardLayout';
 
 // ----------------------------------------------------------------------
 

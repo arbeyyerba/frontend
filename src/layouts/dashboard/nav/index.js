@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 // @mui
-import { styled, alpha } from '@mui/material/styles';
 import { Box, Button, Drawer, Typography, Stack } from '@mui/material';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';

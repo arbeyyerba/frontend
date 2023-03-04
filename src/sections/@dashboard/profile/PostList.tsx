@@ -18,9 +18,11 @@ export function PostList() {
 
     return (
      <>
-        <Typography variant="h2">
-            Posts on your profile:
+         <Box sx={{p: '2em', paddingTop: '5em'}}>
+        <Typography variant="h2" align='center' color='secondary'>
+            Posts on your profile
         </Typography>
+         </Box>
         {profile && profile.authorizers.map((authorizer) => (
             <Grid container spacing={2}>
             <Grid item xs={3} sm={3} md={3} sx={{py: '3em'}}>

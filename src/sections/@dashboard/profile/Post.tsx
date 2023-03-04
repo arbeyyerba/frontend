@@ -1,25 +1,33 @@
 // social media posts on my profile
-import { Card, Typography } from '@mui/material';
+import { Card, Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import Link from 'next/link';
+import useKnownProfiles from 'src/hooks/useKnownProfiles';
 import { Attestation } from 'src/redux/slices/contracts';
 
 export interface PostProps {
     post: Attestation,
+    deletePost?: ()=>{}
 }
 
-export function Post({post} : PostProps) {
+export function Post({post, deletePost} : PostProps) {
+    const knownProfiles = useKnownProfiles();
+
+    const profile = knownProfiles[post?.senderAddress];
+    const name = profile?.name || post?.senderAddress;
+    const avatar = profile?.avatar;
+
     return (
     <Card>
         <Box sx={{p: '1em'}}>
             <Typography variant="body1">
                 {post?.message}
             </Typography>
-            <Link href={`https://polygonscan.com/address/${post.senderAddress}`}>
                 <Typography variant="body2" align='right'>
-                    {post?.senderAddress}
+                    {"from "}
+                    <Link color='inherit' href={`https://polygonscan.com/address/${post.senderAddress}`}>
+                        {name}
+                    </Link>
                 </Typography>
-            </Link>
         </Box>
     </Card>
     )

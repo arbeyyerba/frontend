@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Box, Card, Link, Typography, Stack, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 // components
-import Label from '../../../components/label';
 import { LoadingButton } from '@mui/lab';
 import { useState } from 'react';
 import { useSigner } from 'wagmi';
@@ -36,7 +35,7 @@ export default  function AuthorizerCard({ authorizer, onComplete, leave }) {
   console.log(authorizer);
 
   const [loadingSpinner, setLoadingSpinner] = useState(false);
-  const { data: signer, isError, isLoading, status, isIdle } = useSigner();
+  const { data: signer } = useSigner();
   const profileContractState = useUserProfileContractState();
   
   const currentAuthorizers = profileContractState?.authorizers||[];
@@ -93,7 +92,7 @@ export default  function AuthorizerCard({ authorizer, onComplete, leave }) {
               Leave Group
             </Button>
                         ) : (
-            <Button variant="contained" color="success" size="large" onClick={()=>{}} >
+            <Button variant="contained" color="success" size="large">
               Joined
             </Button>
             ) : (

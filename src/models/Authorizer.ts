@@ -6,7 +6,7 @@ import {
 } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { Types } from "mongoose";
-import { ensureDocumentArray, ensureDocument } from 'src/utils/schemaUtils';
+import { ensureDocument } from 'src/lib/schemaUtils';
 
 
 @index({ address: "hashed" })
@@ -15,9 +15,11 @@ export class Authorizer extends TimeStamps {
   @prop({ required: true })
   public name: string;
   @prop({ required: true })
-  public address: string;
+  public contractAddress: string;
   @prop({ required: true })
-  public transaction: string;
+  public chainId: string
+  @prop({ required: true })
+  public transactionHash: string;
 
     public static async getAuthorizerByAddress(
         this: ReturnModelType<typeof Authorizer>,

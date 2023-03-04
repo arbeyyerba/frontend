@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
-import { Box, Link, Button, Drawer, Typography, Stack } from '@mui/material';
+import { Box, Button, Drawer, Typography, Stack } from '@mui/material';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
@@ -11,18 +11,11 @@ import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 import navConfig from './config';
 import { Web3Button } from '@web3modal/react';
+import { useNetwork } from 'wagmi';
 
 // ----------------------------------------------------------------------
 
 const NAV_WIDTH = 280;
-
-const StyledAccount = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(2, 2.5),
-  borderRadius: Number(theme.shape.borderRadius) * 1.5,
-  backgroundColor: alpha(theme.palette.grey[500], 0.12),
-}));
 
 // ----------------------------------------------------------------------
 
@@ -40,6 +33,10 @@ export default function Nav({ openNav, onCloseNav }) {
     }
   }, [pathname]);
 
+  const { chain } = useNetwork();
+
+  const name = chain.name || 'Not Connected';
+
   const renderContent = (
     <Scrollbar
       sx={{
@@ -51,10 +48,13 @@ export default function Nav({ openNav, onCloseNav }) {
         <Logo />
       </Box>
 
-      <Box sx={{ mb: 5, mx: 2.5 }}>
-          <StyledAccount alignItems='center'>
+      <Box sx={{ mb: 5, mx: 2.5 }} alignContent='center'>
+        <Stack alignItems="center" spacing={3} sx={{ pt: 5, borderRadius: 2, position: 'relative' }}>
             <Web3Button width='100%'/>
-          </StyledAccount>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              Connected to {name}
+            </Typography>
+        </Stack>
       </Box>
 
       <NavSection data={navConfig} />

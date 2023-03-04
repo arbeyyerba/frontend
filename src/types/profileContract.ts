@@ -2,8 +2,8 @@ import { Contract, ethers, Signer } from 'ethers';
 import { Attestation, Authorizer } from 'src/redux/slices/contracts';
 import { Provider } from '@ethersproject/abstract-provider'
 import { arrayify, hexValue, hexZeroPad, keccak256, toUtf8Bytes } from 'ethers/lib/utils.js';
-import Profile from 'src/contracts/Profile.json';
 import AuthorizerContract from 'src/contracts/Authorizer.json';
+const Profile = require('src/contracts/Profile.json');
 
 
 function bitwiseXor(bytesA: Uint8Array, bytesB : Uint8Array): Uint8Array {
@@ -45,9 +45,12 @@ function calculateHash(attestations: Attestation[]): string {
 export class ProfileContract {
   public address: string;
   public contract: Contract;
+  public chainId: string;
 
-  constructor(address: string) {
+  constructor(address: string, chainId: string) {
+    console.log('creating profile contract', address, chainId);
     this.address = address;
+    this.chainId = chainId;
     this.contract = new Contract(address, Profile.abi);
   }
 

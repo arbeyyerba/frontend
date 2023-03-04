@@ -7,7 +7,7 @@ import {
 } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { Types } from "mongoose";
-import { ensureDocumentArray, ensureDocument } from 'src/utils/schemaUtils';
+import { ensureDocumentArray, ensureDocument } from 'src/lib/schemaUtils';
 import { Authorizer } from './Authorizer';
 import { Profile } from './Profile';
 

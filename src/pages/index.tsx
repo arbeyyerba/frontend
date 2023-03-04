@@ -1,100 +1,95 @@
+import {  Stack, Step, StepButton, Stepper, Typography } from '@mui/material';
+import { useState } from 'react';
+
 import { Helmet } from 'react-helmet-async';
 // @mui
-
-import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-// components
-import { ContractFactory } from 'ethers';
 import { useEffect } from 'react';
-import useUserProfileContract from 'src/hooks/useUserProfileContract';
-import { addAuthorizerAddressToProfile, loadUserProfileData} from 'src/redux/slices/contracts';
 import { dispatch, useSelector } from 'src/redux/store';
-import { useProvider, useSigner } from 'wagmi';
+import { useAccount, useNetwork, useProvider } from 'wagmi';
 import AuthGuard from '../components/AuthGuard';
-import useAuthorizerContracts from '../hooks/useAuthorizerContracts';
-import DashboardLayout from '../layouts/dashboard/DashboardLayout';
-import { useCookies } from 'react-cookie';
-import {dbConnect, AuthorizerModel, ProfileModel} from 'src/utils/dbUtils';
-// ----------------------------------------------------------------------
-// have to require import of JSON files 
-const Authorizer = require('../contracts/Authorizer.json');
-const Profile = require('../contracts/Profile.json');
+import DashboardLayout from 'src/layouts/dashboard';
+import { AuthorizerList } from 'src/sections/@dashboard/authorizers';
+import NewProfile from 'src/sections/@dashboard/deployProfile';
+import { useRouter } from 'next/router';
+import { P } from '@wagmi/core/dist/index-35b6525c';
+import { initializeUserProfile } from 'src/redux/slices/contracts';
 
-export default function DashboardAppPage() {
-  const { data: signer, isError, isLoading, status, isIdle } = useSigner();
+
+interface SetupSectionProps {
+  onComplete: ()=>void,
+}
+
+  const steps = [
+    {
+      label: 'Deploy Your Profile',
+      render: ({onComplete}: SetupSectionProps) => {
+        return (
+          <>
+            <Stack spacing={2} alignItems='center'>
+            <Typography variant="h2" align='center' sx={{mt:'2em'}}>
+              Deploy Your Profile
+            </Typography>
+            <NewProfile complete={onComplete}/>
+            </Stack>
+          </>
+        )
+    }
+    },
+    {
+      label: 'Join a Group',
+      render: ({}: SetupSectionProps) => {
+        return (
+          <>
+          <Stack spacing={2} alignItems='center'>
+          <Typography variant="h2" align='center'>
+            Join a Group
+          </Typography>
+          <AuthorizerList/>
+          </Stack>
+          </>
+        )
+      },
+    }
+  ]
+
+export default function DemoPage() {
+  const [completed, setCompleted] = useState(steps.map(()=>false));
+  const [currentStep, setCurrentStep] = useState(0);
   const provider = useProvider();
-  console.log('signer status', signer, isError, isLoading, status, isIdle);
-  const profileContract = useUserProfileContract();
-  const contract = profileContract?.contract;
-  const wellKnownAuthorizers = useAuthorizerContracts();
+  const router = useRouter();
+
+  const account = useAccount();
+  const { chain } = useNetwork();
+  const chainId = chain?.id.toString() || '';
   const profile = useSelector((state) => state.contracts.userProfile);
-  const [cookies, setCookie] = useCookies(['profile_address']);
-
+  
   useEffect(() => {
-    if (cookies['profile_address']) {
-      dispatch(loadUserProfileData(cookies['profile_address'], provider));
+    if (profile) {
+        router.push(`/profile/${chainId}/${profile.address}`);
+    } else if(account.address !== undefined) {
+        console.log('initalizeUserProfile', account.address, chainId, provider);
+        dispatch(initializeUserProfile(account.address, chainId, provider));
     }
-  }, [cookies]);
+    }, [profile, account, chainId, provider]);
+  
+  const completeStep = (index: number) => {
+    const nextCompleted = [...completed]
+    nextCompleted[index] = true;
+    setCompleted(nextCompleted)
+  }
 
 
+  const completeCurrentStep = () => {
+    console.log('completing step', currentStep);
+    completeStep(currentStep)
+    handleStep(currentStep+1)()
+  }
 
-  const deployContract = async () => {
-    console.log('deploying contract...')
-    if (signer) {
-      const contractFactory = new ContractFactory(Profile.abi, Profile.bytecode, signer);
-      const instance = await contractFactory.connect(signer).deploy();
-      console.log('instance', instance);
-      await instance.deployTransaction.wait(1);
-      setCookie('profile_address', instance.address);
-      dispatch(loadUserProfileData(instance.address, provider));
-      await dbConnect();
-      await ProfileModel.create({address: instance.address});
-      console.log('done.');
-    } else {
-      console.log('no signer??');
+  const handleStep = (index: number) => () => {
+    if (index >= steps.length) {
+      index = 0;
     }
-  };
-
-  const addAuthorizer = async () => {
-    console.log('deploying dummy authorizer contract...')
-    if (signer && contract) {
-      const contractFactory = new ContractFactory(Authorizer.abi, Authorizer.bytecode, signer);
-      const instance = await contractFactory.connect(signer).deploy();
-      // TODO make the user click another button to 'add' the new authorizer..
-      const txn = profileContract.addAuthorizer(signer, instance.address);
-      await instance.deployTransaction.wait(1);
-      console.log('txn', txn);
-      dispatch(addAuthorizerAddressToProfile(instance.address));
-      console.log('done.');
-      await dbConnect();
-      await AuthorizerModel.create({address: instance.address, 
-        transaction: txn, name: 'dummy authorizer'});
-    } else {
-      console.log('no signer/contract?', signer, contract);
-    }
-  };
-
-  const addAttestation = async () => {
-    console.log('attesting on contract...')
-    if (signer && contract && profile && profile.authorizers.length > 0) {
-      await profileContract.attest(signer, profile.authorizers[0].address, "this is me, making a statement.")
-      console.log('done.');
-    } else {
-      console.log('no signer/contract/authorizer??', signer,contract,wellKnownAuthorizers);
-    }
-  };
-
-  const funcArray = [deployContract, addAuthorizer, addAttestation];
-
-
-  const refreshChainData = async () => {
-    if (contract) {
-      dispatch(loadUserProfileData(contract.address, provider));
-    }
+    setCurrentStep(index);
   }
 
   return (
@@ -104,73 +99,16 @@ export default function DashboardAppPage() {
           <Helmet>
             <title> Abrey | Own your reputation. </title>
           </Helmet>
-
-          <Container maxWidth="xl">
-            <Typography variant="h4" sx={{ mb: 5 }}>
-              Hi, Welcome to Arbey
-            </Typography>
-
-
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={12} md={12}>
-                <Paper>
-                  <Stack alignItems="center">
-
-                    <Button onClick={deployContract} variant='outlined' sx={{m:1}}>
-                      Deploy my Contract
-                    </Button>
-                    <Button onClick={refreshChainData} variant='outlined' sx={{m:1}}>
-                      Refresh Data from Chain
-                    </Button>
-                    {contract ?
-                      profile && profile.authorizers.length > 0 ?
-                    <Button onClick={addAttestation} variant='outlined' sx={{m:1}}>
-                      Make an attestation
-                    </Button>
-                                            :
-                    <Button onClick={addAuthorizer} variant='outlined' sx={{m:1}}>
-                      Deploy a new authorizer
-                    </Button>
-                    :
-                    <></>
-                    }
-                  </Stack>
-
-                </Paper>
-              </Grid>
-
-              <Grid item xs={12} sm={12} md={12}>
-                <Paper>
-                    <Typography variant="h2">
-                      Authorizers on your profile:
-                    </Typography>
-                  {profile && profile.authorizers.map((authorizer) => (<>
-                    <Typography>
-                      {authorizer.address} : {authorizer.description}
-                    </Typography>
-                </>))}
-                </Paper>
-              </Grid>
-              <Grid item xs={12} sm={12} md={12}>
-                <Paper>
-                    <Typography variant="h2">
-                      Attestations on your profile:
-                    </Typography>
-                  {profile && profile.authorizers.map((authorizer) => (<>
-                    <Typography variant="h3">
-                      authorizer: {authorizer.address}
-                    </Typography>
-                  {profile && profile.attestations[authorizer.address].map((attestation) => (
-                    <Typography>
-                      message: {attestation.message}
-                    </Typography>
-                  ))}
-                  </>))}
-                </Paper>
-              </Grid>
-
-            </Grid>
-          </Container>
+            <Stack spacing={2} alignItems='center'>
+              <Stepper nonLinear activeStep={currentStep} sx={{width: '50%'}}>
+              {steps.map((step, index) => {return (
+                <Step key={step.label} completed={completed[index]}>
+                  <StepButton onClick={handleStep(index)}>{step.label}</StepButton>
+                </Step>
+              )})}
+              </Stepper>
+            </Stack>
+             {steps[currentStep].render({onComplete: completeCurrentStep})}
         </DashboardLayout>
       </AuthGuard>
     </>

@@ -6,7 +6,7 @@
       "es6",
       "dom"
     ],
-    "strict": true,
+    "strict": false,
     "noEmit": true,
     "allowJs": true,
     "jsx": "preserve",
@@ -25,7 +25,7 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
-    "strictPropertyInitialization": true,
+    "strictPropertyInitialization": false,
     "emitDecoratorMetadata": true
   },
   "exclude": [

@@ -1,17 +1,15 @@
-import { ThemeProvider } from '@emotion/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
 import { useTheme, Stack, Paper, FormHelperText } from '@mui/material';
 import { ContractFactory } from 'ethers';
 import { useForm } from 'react-hook-form';
 import { FormProvider,  RHFTextField } from 'src/components/hook-form';
-import useUserProfileContract from 'src/hooks/useUserProfileContract';
 import * as Yup from 'yup';
-import { dispatch, useSelector } from 'src/redux/store';
-import { useProvider, useSigner } from 'wagmi';
-import { useEffect } from 'react';
+import { dispatch } from 'src/redux/store';
+import { useNetwork, useProvider, useSigner } from 'wagmi';
+import {  useState } from 'react';
 import { loadUserProfileData } from 'src/redux/slices/contracts';
-import { useCookies } from 'react-cookie';
+import { createProfile } from 'src/lib/api';
 const Profile = require('../../../contracts/Profile.json');
 
 
@@ -20,10 +18,10 @@ interface NewProfile {
 }
 
 interface NewProfileProps {
-  completeCurrentStep?: () => void;
+  complete: () => void;
 }
 
-export default function NewProfile({completeCurrentStep}: NewProfileProps) {
+export default function NewProfile({complete}: NewProfileProps) {
   const theme = useTheme();
 
   const FormSchema = Yup.object().shape({
@@ -47,37 +45,37 @@ export default function NewProfile({completeCurrentStep}: NewProfileProps) {
    const { data: signer, isError, isLoading, status, isIdle } = useSigner();
    const provider = useProvider();
     console.log('signer status', signer, isError, isLoading, status, isIdle);
-    const profileContract = useUserProfileContract();
-    const contract = profileContract?.contract;
-
-  const [cookies, setCookie] = useCookies(['profile_address']);
-
-  useEffect(() => {
-    if (cookies['profile_address']) {
-      dispatch(loadUserProfileData(cookies['profile_address'], provider));
-    }
-  }, [cookies]);
+    console.log('wtf');
+  const {chain} = useNetwork();
+  const chainId = chain?.id.toString() || '';
+  
+  const [loadingSpinner, setLoadingSpinner] = useState(false);
 
   const onSubmit = async (data: NewProfile) => {
+    setLoadingSpinner(true);
     console.log('deploying contract...')
     if (signer) {
       const contractFactory = new ContractFactory(Profile.abi, Profile.bytecode, signer);
       const instance = await contractFactory.connect(signer).deploy();
       console.log('instance', instance);
-      await instance.deployTransaction.wait(1);
-      setCookie('profile_address', instance.address);
-      dispatch(loadUserProfileData(instance.address, provider));
-        console.log('done.');
-        if (completeCurrentStep) {
-         completeCurrentStep();
-        }
+      const tx = await instance.deployTransaction.wait(1);
+      console.log('tx', tx);
+      console.log('instance',  instance );
+      dispatch(loadUserProfileData(instance.address, chainId, provider));
+      
+      const signerAddress = await signer.getAddress();
+
+      const res = await createProfile({name: data.name, ownerAddress: signerAddress, chainId: chainId.toString(), contractAddress: tx.contractAddress, transactionHash: tx.transactionHash});
+
+      console.log('res', res);
+      
+      console.log('done.'); 
+      complete();
+      setLoadingSpinner(false);
     } else {
       console.log('no signer??');
     }
   }
-
-
-  const showLoadingSpinner = isSubmitting;
 
   return (
       <Paper sx={{ backgroundColor: theme.palette.background.paper, minWidth: '40em', padding:'2em' }}>
@@ -91,7 +89,7 @@ export default function NewProfile({completeCurrentStep}: NewProfileProps) {
             size="large"
             type="submit"
             variant="contained"
-    loading={showLoadingSpinner}
+            loading={loadingSpinner}
           >
             Deploy Profile
           </LoadingButton>

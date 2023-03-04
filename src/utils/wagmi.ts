@@ -3,17 +3,14 @@ import { configureChains, createClient } from 'wagmi'
 import { goerli, mainnet, localhost, polygonMumbai, polygon } from 'wagmi/chains'
 
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
-console.log(process.env);
 console.log('walletConnectProjectId', walletConnectProjectId);
 if (walletConnectProjectId === undefined) {
   throw new Error('Missing walletConnectProjectId');
 }
 const anvilLocalhost = {...localhost, id: 31337};
 
-console.log(process.env.NODE_ENV);
-
 const { chains, provider, webSocketProvider } = configureChains(
-  [polygonMumbai, goerli, polygon, mainnet, ...(process.env.NODE_ENV === 'development' ? [polygonMumbai, goerli, localhost, anvilLocalhost] : [])],
+  [goerli, polygon, polygonMumbai, ...(process.env.NODE_ENV === 'development' ? [polygonMumbai, goerli, localhost, anvilLocalhost] : [])],
   [walletConnectProvider({ projectId: walletConnectProjectId })],
 )
 

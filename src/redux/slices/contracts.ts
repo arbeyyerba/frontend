@@ -1,6 +1,7 @@
 import { Provider } from '@ethersproject/abstract-provider'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { createSlice } from '@reduxjs/toolkit'
+import { getProfileByOwnerAddressAndChainId } from 'src/lib/api'
 import { ProfileContract } from 'src/types/profileContract'
 import { AppDispatch } from '../store'
 
@@ -83,22 +84,40 @@ export const contractsSlice = createSlice({
 // Action creators are generated for each case reducer function
 export const { loadUserProfile, addAttestations, addAuthorizerAddressToProfile, addWellKnownAuthorizer } = contractsSlice.actions
 
-export function loadUserProfileData(address: string, provider: Provider) {
+export function loadUserProfileData(address: string, chainId:string, provider: Provider) {
   return async (dispatch: AppDispatch) => {
-    const contract = new ProfileContract(address);
+    console.log('loading profile data', address, chainId, provider);
+    const contract = new ProfileContract(address, chainId);
     console.log('fetching chain data...');
     const authorizers = await contract.getAllAuthorizers(provider)
     const attestations = await contract.getAllAttestations(provider)
+    const network = await provider.getNetwork();
       // // TODO need to map attestations to whether they are valid or not...
     //const validState = attestations.map(await contract.getValidState(provider, authorizer, messages));
     const profile = {
         address,
+        chainId: network.chainId,
         attestations: attestations,
         authorizers: authorizers,
         validState: {},
     }
     console.log('profile', profile);
     dispatch(loadUserProfile(profile))
+  }
+}
+
+export function initializeUserProfile(ownerAddress: `0x${string}`, chainId:string, provider: Provider) {
+  return async (dispatch: AppDispatch) => {
+    const dbProfile = await getProfileByOwnerAddressAndChainId({ownerAddress, chainId});
+    console.log('dbProfile', dbProfile);
+    if (dbProfile && dbProfile.profile) {
+      console.log('loading profile from db', dbProfile);
+      dispatch(loadUserProfileData(dbProfile.profile.contractAddress, chainId, provider));
+      return;
+    } else {
+      return;
+    }
+    
   }
 }
 

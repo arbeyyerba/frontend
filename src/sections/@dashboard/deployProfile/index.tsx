@@ -10,6 +10,7 @@ import { useNetwork, useProvider, useSigner } from 'wagmi';
 import {  useState } from 'react';
 import { loadUserProfileData } from 'src/redux/slices/contracts';
 import { createProfile } from 'src/lib/api';
+import { ProfileContract } from 'src/types/profileContract';
 const Profile = require('../../../contracts/Profile.json');
 
 
@@ -55,17 +56,12 @@ export default function NewProfile({complete}: NewProfileProps) {
     setLoadingSpinner(true);
     console.log('deploying contract...')
     if (signer) {
-      const contractFactory = new ContractFactory(Profile.abi, Profile.bytecode, signer);
-      const instance = await contractFactory.connect(signer).deploy();
-      console.log('instance', instance);
-      const tx = await instance.deployTransaction.wait(1);
-      console.log('tx', tx);
-      console.log('instance',  instance );
-      dispatch(loadUserProfileData(instance.address, chainId, provider));
+      const profile = await ProfileContract.deploy(signer, data.name, chainId);
+      dispatch(loadUserProfileData(profile.address, chainId, provider));
       
       const signerAddress = await signer.getAddress();
 
-      const res = await createProfile({name: data.name, ownerAddress: signerAddress, chainId: chainId.toString(), contractAddress: tx.contractAddress, transactionHash: tx.transactionHash});
+      const res = await createProfile({name: data.name, ownerAddress: signerAddress, chainId: chainId.toString(), contractAddress: profile.address, transactionHash: profile.transactionHash as string});
 
       console.log('res', res);
       

@@ -56,7 +56,7 @@ export default function ProfilePage() {
           <Helmet>
             <title> Abrey | Own your reputation. </title>
           </Helmet>
-      <ProfileHeader />
+        <ProfileHeader />
 
           <Container maxWidth="xl">
             {profile && profile.authorizers.length === 0 ? (
@@ -69,6 +69,9 @@ export default function ProfilePage() {
               </Grid>
               </>
             )}
+            <Typography variant='h3' align='center'>
+              More groups to join
+            </Typography>
             <AuthorizersList />
           </Container>
         </DashboardLayout>

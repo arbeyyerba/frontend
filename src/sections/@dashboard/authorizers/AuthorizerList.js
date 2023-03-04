@@ -24,7 +24,7 @@ export default  function AuthorizersList({ onComplete }) {
       style={{ paddingTop: '4em'}}>
       {authorizers.map((authorizer) => (
         <Grid key={authorizer.address} item xs={12} sm={6} md={3}>
-          <AuthorizerCard onComplete={onComplete} authorizer={authorizer} />
+          <AuthorizerCard onComplete={onComplete || (()=>{}) } leave={true} authorizer={authorizer} />
         </Grid>
       ))}
     </Grid>

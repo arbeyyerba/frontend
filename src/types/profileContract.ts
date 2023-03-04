@@ -1,4 +1,4 @@
-import { Contract, ethers, Signer } from 'ethers';
+import { Contract, ContractFactory, ethers, Signer } from 'ethers';
 import { Attestation, Authorizer } from 'src/redux/slices/contracts';
 import { Provider } from '@ethersproject/abstract-provider'
 import { arrayify, hexValue, hexZeroPad, keccak256, toUtf8Bytes } from 'ethers/lib/utils.js';
@@ -46,21 +46,43 @@ export class ProfileContract {
   public address: string;
   public contract: Contract;
   public chainId: string;
+  public transactionHash?: string;
 
-  constructor(address: string, chainId: string) {
+  constructor(address: string, chainId: string, transactionHash?: string) {
     console.log('creating profile contract', address, chainId);
     this.address = address;
     this.chainId = chainId;
     this.contract = new Contract(address, Profile.abi);
+    this.transactionHash = transactionHash;
+  }
+
+  static async deploy(signer: Signer, name: string, chainId: string) {
+    const contractFactory = new ContractFactory(Profile.abi, Profile.bytecode, signer);
+    const instance = await contractFactory.connect(signer).deploy(name);
+    console.log('instance', instance);
+    const tx = await instance.deployTransaction.wait(1);
+    console.log('tx', tx);
+    console.log('instance',  instance );
+    return new ProfileContract(instance.address, chainId, tx.transactionHash);
   }
 
   async addAuthorizer(signer: Signer, address: string): Promise<void> {
-    this.contract.connect(signer).addAuthorizer(address);
+    const txn = await this.contract.connect(signer).addAuthorizer(address);
+    await txn.wait(1);
+    return txn;
+  }
+
+  async removeAuthorizer(signer: Signer, address: string): Promise<void> {
+    const txn = await this.contract.connect(signer).removeAuthorizer(address);
+    await txn.wait(1);
+    return txn;
   }
 
   async attest(signer: Signer, authorizer: string, message: string): Promise<void> {
     console.log('attesting:', authorizer, message);
-    this.contract.connect(signer).attest(authorizer, message);
+    const tx = await this.contract.connect(signer).addPost(authorizer, message);
+    await tx.wait(1);
+    return tx;
   }
 
   async getAllAuthorizers(signer: Provider): Promise<Authorizer[]> {
@@ -86,6 +108,18 @@ export class ProfileContract {
   }
 
 
+  async fetchMetadata(provider: Provider): Promise<any> {
+    const connectedContract = this.contract.connect(provider);
+    const metadataUri: string = await connectedContract.getMetadataUri();
+    console.log('metadata');
+    if (metadataUri.startsWith('data:application/json;base64,')) {
+      const jsonBlob = atob(metadataUri.substring(29));
+      console.log('json', jsonBlob);
+      return JSON.parse(jsonBlob);
+    } else {
+      return await fetch(metadataUri);
+    }
+  }
 
   async getAllAttestations(provider: Provider): Promise<Record<string, Attestation[]>> {
     //const id = await this.contract
@@ -93,11 +127,11 @@ export class ProfileContract {
     const authorizers = await connectedContract.getAuthorizerList();
     console.log('attestation authorizers:', authorizers);
     const attestations = await Promise.all(authorizers.map(async (address: string) => {
-      const bigNumLength = await connectedContract.getAttestLength(address)
+      const bigNumLength = await connectedContract.postLengthByAuthorizer(address)
       const length: number = ethers.BigNumber.from(bigNumLength).toNumber();
       console.log('length:', length);
       const rawMessages: [string, string][] = await Promise.all(Array(length).fill(0).map(async (_, index)=>{
-        return await connectedContract.getAttestation(address, index) as [string, string];
+        return await connectedContract.postByAuthorizerAndIndex(address, index) as [string, string];
       }));
       console.log('messages', rawMessages);
       const messages: Attestation[] = rawMessages.map(([sender, message]: [string, string], index) => {

@@ -7,8 +7,9 @@ import * as Yup from 'yup';
 import { dispatch, useSelector } from 'src/redux/store';
 import { useNetwork, useProvider, useSigner } from 'wagmi';
 import {  useState } from 'react';
-import { loadUserProfileData } from 'src/redux/slices/contracts';
+import { addPost, loadUserProfileData } from 'src/redux/slices/contracts';
 import useUserProfileContract from 'src/hooks/useUserProfileContract';
+import useWalletAddress from 'src/hooks/useWallet';
 const Profile = require('../../../contracts/Profile.json'); 
 
 
@@ -24,6 +25,7 @@ export function MakePost() {
     const profile = useSelector((state) => state.contracts.userProfile);
     const authorizers = profile?.authorizers || [];
     const { data: signer, isError, isLoading, status, isIdle } = useSigner();
+    const address = useWalletAddress()
     const [loadingSpinner, setLoadingSpinner] = useState(false);
     const theme = useTheme();
 
@@ -61,6 +63,13 @@ export function MakePost() {
         await profileContract.attest(signer, data.authorizer, data.body)
         console.log('done.');
         setLoadingSpinner(false);
+        dispatch(addPost({group: data.authorizer, post: {
+            id: 0,
+            message: data.body,
+            senderAddress: address as string,
+            deleted: false,
+            authorizerAddress: data.authorizer,
+        }}));
         } else {
         console.log('no signer/contract/authorizer??', signer,contract);
         }

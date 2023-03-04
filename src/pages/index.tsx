@@ -11,7 +11,6 @@ import DashboardLayout from 'src/layouts/dashboard';
 import { AuthorizerList } from 'src/sections/@dashboard/authorizers';
 import NewProfile from 'src/sections/@dashboard/deployProfile';
 import { useRouter } from 'next/router';
-import { P } from '@wagmi/core/dist/index-35b6525c';
 import { initializeUserProfile } from 'src/redux/slices/contracts';
 
 
@@ -37,14 +36,14 @@ interface SetupSectionProps {
     },
     {
       label: 'Join a Group',
-      render: ({}: SetupSectionProps) => {
+      render: ({onComplete}: SetupSectionProps) => {
         return (
           <>
           <Stack spacing={2} alignItems='center'>
           <Typography variant="h2" align='center'>
             Join a Group
           </Typography>
-          <AuthorizerList/>
+            <AuthorizerList onComplete={onComplete} />
           </Stack>
           </>
         )
@@ -62,20 +61,33 @@ export default function DemoPage() {
   const { chain } = useNetwork();
   const chainId = chain?.id.toString() || '';
   const profile = useSelector((state) => state.contracts.userProfile);
-  
+  const profileLoaded = useSelector((state) => state.contracts.loadedProfileFromDb);
+
   useEffect(() => {
-    if (profile) {
-        router.push(`/profile/${chainId}/${profile.address}`);
-    } else if(account.address !== undefined) {
-        console.log('initalizeUserProfile', account.address, chainId, provider);
+    if (!profileLoaded && account?.address && chainId && provider) {
         dispatch(initializeUserProfile(account.address, chainId, provider));
     }
-    }, [profile, account, chainId, provider]);
-  
+  }, [account, chainId, provider]);
+
+  useEffect(() => {
+    console.log('checking if we can reroute');
+      /* if (profileLoaded && profile) {
+  *     router.push(`/profile/${chainId}/${profile.address}`);
+  * } */
+  }, [profileLoaded])
+
+  const allStepsCompleted = (nextCompleted: boolean[]): boolean => {
+      return nextCompleted.every((item) => item);
+  }
+
   const completeStep = (index: number) => {
     const nextCompleted = [...completed]
     nextCompleted[index] = true;
     setCompleted(nextCompleted)
+    if (allStepsCompleted(nextCompleted) && profile) {
+      console.log('all steps completed');
+      router.push(`/profile/${chainId}/${profile.address}`);
+    }
   }
 
 

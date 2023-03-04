@@ -21,5 +21,4 @@ export const client = createClient({
   webSocketProvider,
 })
 
-
 export { chains }

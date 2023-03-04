@@ -4,7 +4,7 @@ import {getRootUrl} from './getRootURL';
 
 export default async function sendRequest(path: any, options = {}) {
   const headers = {
-    ...(options.headers || {}),
+    ...((options as any).headers || {}),
     'Content-type': 'application/json; charset=UTF-8',
   };
 

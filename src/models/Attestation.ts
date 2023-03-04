@@ -17,8 +17,12 @@ import { Profile } from './Profile';
 @modelOptions({ schemaOptions: { collection: "attestations", autoCreate: true } })
 export class Attestation extends TimeStamps {
   @prop({required: true, ref: () => Authorizer})
+  //eslint-disable-next-line
+  //@ts-ignore
   public authorizer: Ref<Authorizer>;
   @prop({required: true, ref: () => Profile})
+  //eslint-disable-next-line
+  //@ts-ignore
   public profile: Ref<Profile>;
   @prop({required: true})
   public attestor: string;

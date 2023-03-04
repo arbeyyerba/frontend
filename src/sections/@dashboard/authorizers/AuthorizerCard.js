@@ -10,7 +10,7 @@ import useUserProfileContractState from 'src/hooks/useUserProfileContractState';
 import { dispatch } from 'src/redux/store';
 import { addAuthorizerAddressToProfile, removeAuthorizerAddressFromProfile} from 'src/redux/slices/contracts';
 import useUserProfileContract from 'src/hooks/useUserProfileContract';
-const Authorizer = require('src/contracts/Authorizer.json');
+
 // ----------------------------------------------------------------------
 
 const StyledProductImg = styled('img')({
@@ -52,9 +52,8 @@ export default  function AuthorizerCard({ authorizer, onComplete, leave }) {
       console.log('done.');
       setLoadingSpinner(false);
       onComplete();
-      
     } else {
-      console.log('no signer/contract?', signer, contract);
+      console.log('no signer/contract?', signer, profileContract );
     }
   };
 
@@ -70,7 +69,7 @@ export default  function AuthorizerCard({ authorizer, onComplete, leave }) {
       onComplete();
 
     } else {
-      console.log('no signer/contract?', signer, contract);
+      console.log('no signer/contract?', signer, profileContract );
     }
   };
 
@@ -86,7 +85,7 @@ export default  function AuthorizerCard({ authorizer, onComplete, leave }) {
             {name}
           </Typography>
         </Link>
-        {onComplete && (currentAuthorizers.find(authorizer => authorizer.address.toLocaleLowerCase() === address.toLocaleLowerCase()) ?
+        {onComplete && (currentAuthorizers.find(currentAuthorizer => currentAuthorizer.address.toLocaleLowerCase() === address.toLocaleLowerCase()) ?
                         leave ? (
             <Button variant="contained" color="error" size="large" onClick={removeAuthorizer} >
               Leave Group

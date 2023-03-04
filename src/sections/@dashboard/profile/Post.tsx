@@ -6,15 +6,15 @@ import { Attestation } from 'src/redux/slices/contracts';
 
 export interface PostProps {
     post: Attestation,
-    deletePost?: ()=>{}
+    deletePost?: () => void,
 }
 
-export function Post({post, deletePost} : PostProps) {
+export function Post({post} : PostProps) {
     const knownProfiles = useKnownProfiles();
 
     const profile = knownProfiles[post?.senderAddress];
     const name = profile?.name || post?.senderAddress;
-    const avatar = profile?.avatar;
+    /* const avatar = profile?.avatar; */
 
     return (
     <Card>

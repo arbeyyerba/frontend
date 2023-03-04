@@ -1,6 +1,6 @@
 import { modalConnectors, walletConnectProvider } from '@web3modal/ethereum'
 import { configureChains, createClient } from 'wagmi'
-import { goerli, mainnet, localhost, polygonMumbai, polygon } from 'wagmi/chains'
+import { goerli, localhost, polygonMumbai, polygon } from 'wagmi/chains'
 
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 console.log('walletConnectProjectId', walletConnectProjectId);

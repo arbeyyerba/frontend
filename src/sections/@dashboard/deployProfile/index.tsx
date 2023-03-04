@@ -1,7 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
 import { useTheme, Stack, Paper, FormHelperText } from '@mui/material';
-import { ContractFactory } from 'ethers';
 import { useForm } from 'react-hook-form';
 import { FormProvider,  RHFTextField } from 'src/components/hook-form';
 import * as Yup from 'yup';
@@ -11,7 +10,6 @@ import {  useState } from 'react';
 import { loadUserProfileData } from 'src/redux/slices/contracts';
 import { createProfile } from 'src/lib/api';
 import { ProfileContract } from 'src/types/profileContract';
-const Profile = require('../../../contracts/Profile.json');
 
 
 interface NewProfile {
@@ -40,7 +38,7 @@ export default function NewProfile({complete}: NewProfileProps) {
   });
 
   const {
-    formState: { errors, isSubmitting },
+    formState: { errors },
     handleSubmit,
   } = methods;
    const { data: signer, isError, isLoading, status, isIdle } = useSigner();

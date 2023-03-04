@@ -37,14 +37,14 @@ export class LensContract {
     }
   }
 
-  static async shareOnLens(signer: Signer, message: string): Promise<void> {
-    // const connectedLensContract = lensContract.connect(signer);
-    // const profileId = await connectedLensContract.defaultProfile(address);
-    // if (profileId) {
-    //   // wtf does 'post' take
-    //   //await connectedLensContract.post(message);
-    // } else {
-    //   return undefined;
-    // }
-  }
+  // static async shareOnLens(signer: Signer, message: string): Promise<void> {
+  //   // const connectedLensContract = lensContract.connect(signer);
+  //   // const profileId = await connectedLensContract.defaultProfile(address);
+  //   // if (profileId) {
+  //   //   // wtf does 'post' take
+  //   //   //await connectedLensContract.post(message);
+  //   // } else {
+  //   //   return undefined;
+  //   // }
+  // }
 }

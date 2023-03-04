@@ -11,7 +11,7 @@ export async function ensureDocumentArray<T>(
   errorMessageProducer?: () => string,
   debug?: boolean
 ): Promise<Array<DocumentType<T>>> {
-  const queryResult = await query.catch((e) => console.log("uh oh", e));
+  const queryResult = await query.catch((e: any) => console.log("uh oh, query error!", e));
   if (isDocumentArray(queryResult)) {
     return queryResult as unknown as Array<DocumentType<T>>;
   } else {

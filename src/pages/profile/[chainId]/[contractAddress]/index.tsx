@@ -6,7 +6,6 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 // components
 import { useEffect } from 'react';
-import useUserProfileContract from 'src/hooks/useUserProfileContract';
 import {  loadUserProfileData} from 'src/redux/slices/contracts';
 import { dispatch, useSelector } from 'src/redux/store';
 import { useProvider, useSigner } from 'wagmi';
@@ -26,8 +25,8 @@ export default function ProfilePage() {
   const { data: signer, isError, isLoading, status, isIdle } = useSigner();
   const provider = useProvider();
   console.log('signer status', signer, isError, isLoading, status, isIdle);
-  const profileContract = useUserProfileContract();
-  const contract = profileContract?.contract;
+    /* const profileContract = useUserProfileContract(); */
+    /* const contract = profileContract?.contract; */
   const profile = useSelector((state) => state.contracts.userProfile);
   const router = useRouter();
   const chainId = router.query.chainId;
@@ -35,7 +34,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
   if (chainId && contractAddress && provider) {
-      dispatch(loadUserProfileData(contractAddress, chainId, provider));
+      dispatch(loadUserProfileData(contractAddress, chainId as string, provider));
     }
   }, [chainId, contractAddress, provider]);
 

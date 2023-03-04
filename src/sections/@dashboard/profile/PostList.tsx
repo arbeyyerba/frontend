@@ -1,5 +1,5 @@
 // social media posts on my profile
-import { Paper, Grid, Stack, Typography, Card } from '@mui/material';
+import { Grid, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useSelector } from 'src/redux/store';
 import { AuthorizerCard } from '../authorizers';
@@ -7,9 +7,9 @@ import { Post } from './Post';
 
 
 export function PostList() {
-    interface Posts {
-        authorizer: string, posts: string[]
-    }
+    /* interface Posts {
+*     authorizer: string, posts: string[]
+* } */
 
     const profile = useSelector((state) => state.contracts.userProfile);
 

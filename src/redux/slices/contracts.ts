@@ -5,7 +5,7 @@ import { getProfileByOwnerAddressAndChainId } from 'src/lib/api'
 import { LensContract } from 'src/types/lensContract'
 import { ProfileContract } from 'src/types/profileContract'
 import authorizersMock from 'src/_mock/authorizers'
-import { AppDispatch, dispatch as appDispatch, RootState } from '../store'
+import { AppDispatch, dispatch as appDispatch } from '../store'
 
 export interface Authorizer {
   address: string,
@@ -135,7 +135,7 @@ export function loadUserProfileData(address: string, chainId:string, provider: P
     const network = await provider.getNetwork();
     const profileMetadata = await contract.fetchMetadata(provider);
     const hydratedAuthorizers = authorizers.map((authorizer)=>{
-      const wellKnown = authorizersMock[chainId].find((mock)=>mock.address.toLowerCase() == authorizer.address.toLowerCase());
+      const wellKnown = authorizersMock[chainId as any].find((mock: Authorizer)=>mock.address.toLowerCase() == authorizer.address.toLowerCase());
       console.log('wellknown', authorizer, authorizersMock, wellKnown);
       if (wellKnown) {
         return {
@@ -175,7 +175,7 @@ export function loadUserProfileData(address: string, chainId:string, provider: P
 }
 
 export function initializeUserProfile(ownerAddress: `0x${string}`, chainId:string, provider: Provider) {
-  dispatch(loadedFromDb(false));
+  appDispatch(loadedFromDb(false));
   return async (dispatch: AppDispatch) => {
     const dbProfile = await getProfileByOwnerAddressAndChainId({ownerAddress, chainId});
     console.log('dbProfile', dbProfile);

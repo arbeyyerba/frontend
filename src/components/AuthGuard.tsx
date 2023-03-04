@@ -2,8 +2,7 @@ import { Button, Stack } from '@mui/material';
 import { Web3Button } from '@web3modal/react';
 import dynamic from 'next/dynamic';
 import { PropsWithChildren } from 'react';
-import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi';
-
+import { useAccount, useSwitchNetwork } from 'wagmi';
 
 
 // ----------------------------------------------------------------------

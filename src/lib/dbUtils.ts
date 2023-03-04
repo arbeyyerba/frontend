@@ -4,7 +4,7 @@ import { Profile } from 'src/models/Profile';
 import { Attestation } from 'src/models/Attestation';
 import { getModelForClass } from '@typegoose/typegoose';
 
-const MONGODB_URI = process.env.NEXT_PUBLIC_MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
   throw new Error(

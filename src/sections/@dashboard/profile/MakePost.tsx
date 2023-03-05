@@ -112,7 +112,7 @@ export function MakePost() {
             })}
           </RHFSelect>
           {errorMessage && (
-            <Typography>
+            <Typography align='center' color='error'>
                 {errorMessage}
             </Typography>)
           }

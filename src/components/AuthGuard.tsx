@@ -30,7 +30,7 @@ export function DynamicAuthGuard({children}: PropsWithChildren) {
           flexDirection:'column',
           p:2,
         }}>
-          <Stack alignItems='center' justifyContent='center' >
+          <Stack alignItems='center' justifyContent='center' spacing={4} >
             <Typography variant='h2' align='center' sx={{mb:2}}>
               Connect Your Wallet to Abrey
             </Typography>

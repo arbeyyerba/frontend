@@ -1,6 +1,6 @@
 import { Contract, Signer } from 'ethers';
 import { Provider } from '@ethersproject/abstract-provider'
-import { formatBytes32String, toUtf8Bytes } from 'ethers/lib/utils.js';
+import { toUtf8Bytes } from 'ethers/lib/utils.js';
 const Lens = require('src/contracts/Lens.json');
 
 export interface LensData {

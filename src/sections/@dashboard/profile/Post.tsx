@@ -20,6 +20,7 @@ export function Post({post} : PostProps) {
 
     const profile = knownProfiles[post?.senderAddress];
     const name = profile?.name || post?.senderAddress;
+    const link = profile.lens ? `https://lenster.xyz/u/${name}` : `https://polygonscan.com/address/${post.senderAddress}`
 
     /* const avatar = profile?.avatar; */
 
@@ -47,13 +48,13 @@ export function Post({post} : PostProps) {
             <Stack>
                 <Typography variant="body2" align='right'>
                     {"from "}
-                    <Link color='inherit' href={`https://polygonscan.com/address/${post.senderAddress}`}>
+                    <Link color='inherit' href={link}>
                         {name}
                     </Link>
                 </Typography>
                 {profile?.lens  && (
                     <Stack direction="row">
-                    <Button onClick={followOnLens} disabled={following}>
+                    <Button onClick={followOnLens} disabled={following} sx={{marginLeft: 'auto', marginRight: 0}}>
                         {followPending ?
                          "Loading..."
                         :
@@ -64,8 +65,7 @@ export function Post({post} : PostProps) {
                         }
                     </Button>
                     </Stack>
-                )
-                }
+                )}
             </Stack>
         </Box>
     </Card>

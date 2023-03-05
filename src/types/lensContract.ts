@@ -15,24 +15,30 @@ export class LensContract {
   static async getLensData(provider: Provider, address: string): Promise<LensData | undefined> {
     const connectedLensContract = lensContract.connect(provider);
     const profileId = await connectedLensContract.defaultProfile(address);
-    if (profileId) {
-      const [handle, uri] = await Promise.all([
-        connectedLensContract.getHandle(profileId),
-        connectedLensContract.tokenURI(profileId),
-      ]);
-      console.log('metadata');
-      let json;
-      if (uri.startsWith('data:application/json;base64,')) {
-        const jsonBlob = atob(uri.substring(29));
-        console.log('json', jsonBlob);
-        json = JSON.parse(jsonBlob);
-      }
+    console.log('profileId', profileId);
+    try {
+      if (profileId) {
+        const [handle, uri] = await Promise.all([
+          connectedLensContract.getHandle(profileId),
+          connectedLensContract.tokenURI(profileId),
+        ]);
+        console.log('metadata');
+        let json;
+        if (uri.startsWith('data:application/json;base64,')) {
+          const jsonBlob = atob(uri.substring(29));
+          console.log('json', jsonBlob);
+          json = JSON.parse(jsonBlob);
+        }
 
-      return {
-        handle: json.name || handle,
-        avatar: json.image,
-      };
-    } else {
+        return {
+          handle: json.name || handle,
+          avatar: json.image,
+        };
+      } else {
+        return undefined;
+      }
+    } catch (e) {
+      console.log('error looking up lens error', e)
       return undefined;
     }
   }

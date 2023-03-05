@@ -17,6 +17,7 @@ export interface Authorizer {
 
 export interface ProfileContractState {
   address: string,
+  ownerAddress: string,
   authorizers: Authorizer[],
   validState: Record<string, boolean> //whether or not the hashes match for a particular authorizer.
   attestations: Record<string, Attestation[]>,
@@ -144,6 +145,7 @@ export function loadUserProfileData(address: string, chainId:string, provider: P
     console.log('fetching chain data...');
     const authorizers = await contract.getAllAuthorizers(provider)
     const attestations = await contract.getAllAttestations(provider)
+    const ownerAddress = await contract.getOwner(provider)
     const network = await provider.getNetwork();
     const profileMetadata = await contract.fetchMetadata(provider);
     const hydratedAuthorizers = authorizers.map((authorizer)=>{
@@ -179,6 +181,7 @@ export function loadUserProfileData(address: string, chainId:string, provider: P
         chainId: network.chainId,
         attestations: attestations,
         authorizers: hydratedAuthorizers,
+      ownerAddress,
         validState: {},
     }
     console.log('profile', profile);

@@ -1,5 +1,6 @@
 import { Contract, Signer } from 'ethers';
 import { Provider } from '@ethersproject/abstract-provider'
+import { formatBytes32String, toUtf8Bytes } from 'ethers/lib/utils.js';
 const Lens = require('src/contracts/Lens.json');
 
 export interface LensData {
@@ -39,7 +40,7 @@ export class LensContract {
     const connectedLensContract = lensContract.connect(signer);
     const profileId = await connectedLensContract.defaultProfile(address);
     if (profileId) {
-      await connectedLensContract.follow([profileId], []);
+      await connectedLensContract.follow([profileId], toUtf8Bytes("Thanks for your endorsement on Abrey!"));
     } else {
       return undefined;
     }

@@ -15,6 +15,10 @@ import { EthereumClient } from '@web3modal/ethereum';
 import * as React from 'react';
 import { chains, client } from 'src/utils/wagmi';
 import { WagmiConfig } from 'wagmi';
+import { LensProvider } from '@lens-protocol/react';
+import {bindings as wagmiBindings} from '@lens-protocol/react';
+import {localStorage} from '@lens-protocol/react/web';
+import { LensConfig, staging } from '@lens-protocol/react';
 
 const ethereumClient = new EthereumClient(client, chains)
 
@@ -30,8 +34,14 @@ export default function MyApp(props: AppProps) {
       <WagmiConfig client={client}>
         <ReduxProvider store={store}>
         <ThemeProvider>
+          <LensProvider config={{
+            bindings: wagmiBindings,
+            environment: staging,
+            storage: localStorage(),
+          }}>
           <Web3Modal projectId={walletConnectProjectId} ethereumClient={ethereumClient} />
           <Component {...pageProps} />
+          </LensProvider>
         </ThemeProvider>
         </ReduxProvider>
       </WagmiConfig>

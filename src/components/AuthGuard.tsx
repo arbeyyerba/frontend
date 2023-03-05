@@ -1,4 +1,4 @@
-import { Paper, Stack } from '@mui/material';
+import { Paper, Stack, Typography } from '@mui/material';
 import { Web3Button } from '@web3modal/react';
 import dynamic from 'next/dynamic';
 import { PropsWithChildren } from 'react';
@@ -31,6 +31,9 @@ export function DynamicAuthGuard({children}: PropsWithChildren) {
           p:2,
         }}>
           <Stack alignItems='center' justifyContent='center' >
+            <Typography variant='h2' align='center' sx={{mb:2}}>
+              Connect Your Wallet to Abrey
+            </Typography>
             <Web3Button />
           </Stack>
         </Paper>

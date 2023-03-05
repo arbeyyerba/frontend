@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
-import { useTheme, Stack, Paper, FormHelperText, MenuItem, Alert } from '@mui/material';
+import { useTheme, Stack, Paper, FormHelperText, MenuItem, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { FormProvider,  RHFSelect,  RHFTextField } from 'src/components/hook-form';
 import * as Yup from 'yup';
@@ -76,11 +76,13 @@ export function MakePost() {
                     }}));
                 } else {
                     setMessage('you do not meet the requirements to post using that authorizer!')
+                    setLoadingSpinner(false);
                 }
             } else {
             console.log('no signer/contract/authorizer??', signer,contract);
             }
         } catch (e) {
+            console.log('error during attest', e);
             setLoadingSpinner(false);
         }
     };
@@ -109,9 +111,9 @@ export function MakePost() {
             })}
           </RHFSelect>
           {errorMessage && (
-            <Alert>
+            <Typography>
                 {errorMessage}
-            </Alert>)
+            </Typography>)
           }
           <LoadingButton
             fullWidth

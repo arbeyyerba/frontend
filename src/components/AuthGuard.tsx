@@ -1,4 +1,4 @@
-import { Button, Paper, Stack } from '@mui/material';
+import { Paper, Stack } from '@mui/material';
 import { Web3Button } from '@web3modal/react';
 import dynamic from 'next/dynamic';
 import { PropsWithChildren } from 'react';

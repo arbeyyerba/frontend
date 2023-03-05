@@ -212,7 +212,7 @@ export function fetchProfileMetadata(address: string, chainId: string,  provider
         avatar: lensData.avatar,
         lens: true,
       }}));
-    } if (dbProfile && dbProfile.profile) {
+    } else if (dbProfile && dbProfile.profile) {
       console.log('found profile', dbProfile.profile);
       dispatch(loadProfileMetadata({address, metadata: {
         name: dbProfile.profile.name,

@@ -68,7 +68,7 @@ export class ProfileContract {
   }
 
   async canAttest(signer: Signer, authorizerAddress: string, message: string): Promise<boolean> {
-    const canAttest = await new Contract(authorizerAddress, AuthorizerAbi.abi).connect(signer).isValidPost(signer.getAddress(), this.contract.address, message);
+    const canAttest = await new Contract(authorizerAddress, AuthorizerAbi.abi).connect(signer).isPostValid(signer.getAddress(), this.contract.address, message);
     return canAttest;
   }
 

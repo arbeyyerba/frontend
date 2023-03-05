@@ -51,7 +51,7 @@ export default function Nav({ openNav, onCloseNav }) {
               Connected to {name}
             </Typography>
             {chains.map((x) => (
-            <Button onClick={()=> switchNetwork?.(x.id)}>use {x.name}</Button>
+            <Button onClick={()=> switchNetwork?.(x.id)} variant='outlined' size='large' sx={{width:'80%'}}>{x.name}</Button>
           ))}
         </Stack>
       </Box>

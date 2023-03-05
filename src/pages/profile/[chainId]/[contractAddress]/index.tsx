@@ -16,6 +16,7 @@ import AuthorizersList from 'src/sections/@dashboard/authorizers/AuthorizerList'
 import { ProfileHeader } from 'src/sections/@dashboard/profile/ProfileHeader';
 import { MakePost } from 'src/sections/@dashboard/profile/MakePost';
 import { PostList } from 'src/sections/@dashboard/profile/PostList';
+import useIsOwner from 'src/hooks/useIsOwner';
 
 // ----------------------------------------------------------------------
 // have to require import of JSON files 
@@ -31,6 +32,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const chainId = router?.query?.chainId;
   const contractAddress = router.query?.contractAddress as string;
+  const isOwner = useIsOwner()
 
   useEffect(() => {
   if (chainId && contractAddress && provider) {
@@ -64,14 +66,18 @@ export default function ProfilePage() {
               </Grid>
               </>
             )}
-            <Typography variant='h3' align='center' color="secondary">
-              {profile && profile.authorizers && profile.authorizers.length == 0 ?
-                "Join a group to get started"
-              :
-                "More groups to join"
-              }
-            </Typography>
-            <AuthorizersList />
+            {isOwner && (
+              <>
+                <Typography variant='h3' align='center' color="secondary">
+                  {profile && profile.authorizers && profile.authorizers.length == 0 ?
+                    "Join a group to get started"
+                  :
+                    "More groups to join"
+                  }
+                </Typography>
+                <AuthorizersList />
+              </>
+            )}
           </Container>
         </DashboardLayout>
       </AuthGuard>

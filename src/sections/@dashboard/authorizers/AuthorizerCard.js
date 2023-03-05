@@ -11,7 +11,7 @@ import { dispatch } from 'src/redux/store';
 import { addAuthorizerAddressToProfile, removeAuthorizerAddressFromProfile} from 'src/redux/slices/contracts';
 import useUserProfileContract from 'src/hooks/useUserProfileContract';
 import { useRouter } from 'next/router';
-import useWalletAddress from 'src/hooks/useWallet';
+import useIsOwner from 'src/hooks/useIsOwner';
 
 // ----------------------------------------------------------------------
 
@@ -39,14 +39,14 @@ export default  function AuthorizerCard({ authorizer, onComplete, leave }) {
   const [loadingSpinner, setLoadingSpinner] = useState(false);
   const { data: signer } = useSigner();
   const profileContractState = useUserProfileContractState();
+
   
   const currentAuthorizers = profileContractState?.authorizers||[];
   console.log('currentAuthorizers', currentAuthorizers);
   const profileContract = useUserProfileContract();
   const router = useRouter();
   const chainId = router.query.chainId;
-  const walletAddress = useWalletAddress();
-  const isOwner = walletAddress.toLowerCase() == profileContractState?.ownerAddress?.toLowerCase();
+  const isOwner = useIsOwner()
 
   const addAuthorizer = async () => {
     setLoadingSpinner(true);

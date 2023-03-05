@@ -89,6 +89,7 @@ export function MakePost() {
 
     const onSelectType = (event: any) => {
         setValue('authorizer', event.target.value as string);
+        setMessage('');
     };
     
     return (

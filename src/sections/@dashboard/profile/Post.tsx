@@ -1,4 +1,5 @@
 // social media posts on my profile
+import { useActiveProfile } from '@lens-protocol/react';
 import { Card, Link, Stack, Typography, Button } from '@mui/material';
 import { Box } from '@mui/system';
 import useKnownProfiles from 'src/hooks/useKnownProfiles';
@@ -17,6 +18,9 @@ export function Post({post} : PostProps) {
 
     const profile = knownProfiles[post?.senderAddress];
     const name = profile?.name || post?.senderAddress;
+    const {data} = useActiveProfile();
+    const lensProfile = data;
+
     /* const avatar = profile?.avatar; */
 
     const shareOnLens = () => {
@@ -44,13 +48,10 @@ export function Post({post} : PostProps) {
                         {name}
                     </Link>
                 </Typography>
-                {profile?.lens && (
+                {profile?.lens && lensProfile && (
                     <Stack direction="row">
                     <Button onClick={followOnLens}>
                         Follow on Lens
-                    </Button>
-                    <Button onClick={shareOnLens}>
-                        Share on Lens
                     </Button>
                     </Stack>
                 )

@@ -17,8 +17,10 @@ export class LensContract {
     const connectedLensContract = lensContract.connect(provider);
     const profileId = await connectedLensContract.defaultProfile(address);
     if (profileId) {
-      const handle = await connectedLensContract.getHandle(profileId);
-      const uri = await connectedLensContract.tokenURI(profileId);
+      const [handle, uri] = await Promise.all([
+        connectedLensContract.getHandle(profileId),
+        connectedLensContract.tokenURI(profileId),
+      ]);
       console.log('metadata');
       let json;
       if (uri.startsWith('data:application/json;base64,')) {
@@ -40,7 +42,7 @@ export class LensContract {
     const connectedLensContract = lensContract.connect(signer);
     const profileId = await connectedLensContract.defaultProfile(address);
     if (profileId) {
-      await connectedLensContract.follow([profileId], toUtf8Bytes("Thanks for your endorsement on Abrey!"));
+      await connectedLensContract.follow([profileId], [[]]);
     } else {
       return undefined;
     }

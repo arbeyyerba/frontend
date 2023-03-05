@@ -23,9 +23,9 @@ export function Post({post} : PostProps) {
 
     /* const avatar = profile?.avatar; */
 
-    const shareOnLens = () => {
-        console.log('NYI');
-    }
+    /* const shareOnLens = () => {
+*     console.log('NYI');
+* } */
 
     const followOnLens = () => {
         if (signer) {

@@ -65,10 +65,22 @@ export const contractsSlice = createSlice({
     loadUserProfile: (state, action: PayloadAction<ProfileContractState>) => {
       state.userProfile = action.payload
     },
-    addAuthorizerAddressToProfile: (state, action: PayloadAction<string>) => {
+    addAuthorizerAddressToProfile: (state, action: PayloadAction<{address: string, chainId?: number}>) => {
       if (state.userProfile) {
-        state.userProfile.authorizers.push({address: action.payload, description: 'new authorizer (no info)'})
-        state.userProfile.attestations[action.payload] = [];
+
+      const wellKnown = action.payload.chainId && authorizersMock[action.payload.chainId].find((mock: Authorizer)=>mock.address.toLowerCase() == action.payload.address.toLowerCase());
+      if (wellKnown) {
+        state.userProfile.authorizers.push({
+          address: action.payload.address,
+          name: wellKnown.name,
+          description: wellKnown.description,
+          avatar: wellKnown.avatar,
+        })
+      } else {
+        state.userProfile.authorizers.push({address: action.payload.address, description: 'new authorizer (no info)'})
+      }
+
+        state.userProfile.attestations[action.payload.address] = [];
       }
     },
     removeAuthorizerAddressFromProfile: (state, action: PayloadAction<string>) => {

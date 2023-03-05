@@ -10,6 +10,7 @@ import useUserProfileContractState from 'src/hooks/useUserProfileContractState';
 import { dispatch } from 'src/redux/store';
 import { addAuthorizerAddressToProfile, removeAuthorizerAddressFromProfile} from 'src/redux/slices/contracts';
 import useUserProfileContract from 'src/hooks/useUserProfileContract';
+import { useRouter } from 'next/router';
 
 // ----------------------------------------------------------------------
 
@@ -41,6 +42,8 @@ export default  function AuthorizerCard({ authorizer, onComplete, leave }) {
   const currentAuthorizers = profileContractState?.authorizers||[];
   console.log('currentAuthorizers', currentAuthorizers);
   const profileContract = useUserProfileContract();
+  const router = useRouter();
+  const chainId = router.query.chainId;
 
   const addAuthorizer = async () => {
     setLoadingSpinner(true);
@@ -48,7 +51,7 @@ export default  function AuthorizerCard({ authorizer, onComplete, leave }) {
     if (signer && profileContract) {
       const txn = await profileContract.addAuthorizer(signer, authorizer.address);
       console.log('txn', txn);
-      dispatch(addAuthorizerAddressToProfile(address));
+      dispatch(addAuthorizerAddressToProfile({address, chainId}));
       console.log('done.');
       setLoadingSpinner(false);
       onComplete();

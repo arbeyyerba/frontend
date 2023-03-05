@@ -5,12 +5,11 @@ import { Box, Button, Drawer, Typography, Stack } from '@mui/material';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
-import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 import navConfig from './config';
 import { Web3Button } from '@web3modal/react';
-import { useNetwork } from 'wagmi';
+import { useNetwork, useSwitchNetwork } from 'wagmi';
 
 // ----------------------------------------------------------------------
 
@@ -33,6 +32,8 @@ export default function Nav({ openNav, onCloseNav }) {
   }, [pathname]);
 
   const { chain } = useNetwork();
+  const { chains, switchNetwork } = useSwitchNetwork();
+
 
   const name = chain.name || 'Not Connected';
 
@@ -43,16 +44,15 @@ export default function Nav({ openNav, onCloseNav }) {
         '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
       }}
     >
-      <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
-        <Logo />
-      </Box>
-
       <Box sx={{ mb: 5, mx: 2.5 }} alignContent='center'>
         <Stack alignItems="center" spacing={3} sx={{ pt: 5, borderRadius: 2, position: 'relative' }}>
             <Web3Button width='100%'/>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Connected to {name}
             </Typography>
+            {chains.map((x) => (
+            <Button onClick={()=> switchNetwork?.(x.id)}>use {x.name}</Button>
+          ))}
         </Stack>
       </Box>
 

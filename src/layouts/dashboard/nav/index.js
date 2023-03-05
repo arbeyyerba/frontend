@@ -68,7 +68,7 @@ export default function Nav({ openNav, onCloseNav }) {
             sx={{ width: 100, position: 'absolute', top: -50 }}
           />
 
-          <Button href="https://www.github.com/" target="_blank" variant="contained">
+          <Button href="https://github.com/jonvaljonathan/EIPs/blob/master/EIPS/eip-draft-user-owned-social-reputation-profiles.md" target="_blank" variant="contained">
             Check Out Our EIP Draft
           </Button>
         </Stack>

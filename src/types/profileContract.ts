@@ -4,6 +4,7 @@ import { Provider } from '@ethersproject/abstract-provider'
 import { arrayify, hexValue, hexZeroPad, keccak256, toUtf8Bytes } from 'ethers/lib/utils.js';
 import AuthorizerContract from 'src/contracts/Authorizer.json';
 const Profile = require('src/contracts/Profile.json');
+const AuthorizerAbi = require('src/contracts/Authorizer.json');
 
 
 function bitwiseXor(bytesA: Uint8Array, bytesB : Uint8Array): Uint8Array {
@@ -64,6 +65,11 @@ export class ProfileContract {
     console.log('tx', tx);
     console.log('instance',  instance );
     return new ProfileContract(instance.address, chainId, tx.transactionHash);
+  }
+
+  async canAttest(signer: Signer, authorizerAddress: string, message: string): Promise<boolean> {
+    const canAttest = await new Contract(authorizerAddress, AuthorizerAbi.abi).connect(signer).isValidPost(signer.getAddress(), this.contract.address, message);
+    return canAttest;
   }
 
   async addAuthorizer(signer: Signer, address: string): Promise<void> {

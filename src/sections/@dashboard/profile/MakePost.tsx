@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
-import { useTheme, Stack, Paper, FormHelperText, MenuItem } from '@mui/material';
+import { useTheme, Stack, Paper, FormHelperText, MenuItem, Alert } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { FormProvider,  RHFSelect,  RHFTextField } from 'src/components/hook-form';
 import * as Yup from 'yup';
@@ -27,6 +27,7 @@ export function MakePost() {
     const address = useWalletAddress()
     const [loadingSpinner, setLoadingSpinner] = useState(false);
     const theme = useTheme();
+    const [errorMessage, setMessage] = useState('');
 
     const authorizerOptions = authorizers.map((authorizer) => ({
         value: authorizer.address,
@@ -57,20 +58,30 @@ export function MakePost() {
     
     const onSubmit = async (data: NewPost) => {
         setLoadingSpinner(true);
-        console.log('attesting on contract...')
-        if (signer && contract && profile && profile.authorizers.length > 0) {
-        await profileContract.attest(signer, data.authorizer, data.body)
-        console.log('done.');
-        setLoadingSpinner(false);
-        dispatch(addPost({group: data.authorizer, post: {
-            id: 0,
-            message: data.body,
-            senderAddress: address as string,
-            deleted: false,
-            authorizerAddress: data.authorizer,
-        }}));
-        } else {
-        console.log('no signer/contract/authorizer??', signer,contract);
+        try {
+            setMessage('');
+            console.log('attesting on contract...')
+            if (signer && contract && profile && profile.authorizers.length > 0) {
+                const canAttest = await profileContract.canAttest(signer, data.authorizer, data.body)
+                if (canAttest) {
+                    await profileContract.attest(signer, data.authorizer, data.body)
+                    console.log('done.');
+                    setLoadingSpinner(false);
+                    dispatch(addPost({group: data.authorizer, post: {
+                        id: 0,
+                        message: data.body,
+                        senderAddress: address as string,
+                        deleted: false,
+                        authorizerAddress: data.authorizer,
+                    }}));
+                } else {
+                    setMessage('you do not meet the requirements to post using that authorizer!')
+                }
+            } else {
+            console.log('no signer/contract/authorizer??', signer,contract);
+            }
+        } catch (e) {
+            setLoadingSpinner(false);
         }
     };
 
@@ -97,6 +108,11 @@ export function MakePost() {
                 )
             })}
           </RHFSelect>
+          {errorMessage && (
+            <Alert>
+                {errorMessage}
+            </Alert>)
+          }
           <LoadingButton
             fullWidth
             color="primary"
@@ -116,5 +132,4 @@ export function MakePost() {
         </FormProvider>
       </Paper>
     )
-    
 }

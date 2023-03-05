@@ -54,18 +54,22 @@ export default function NewProfile({complete}: NewProfileProps) {
     setLoadingSpinner(true);
     console.log('deploying contract...')
     if (signer) {
-      const profile = await ProfileContract.deploy(signer, data.name, chainId);
-      dispatch(loadUserProfileData(profile.address, chainId, provider));
-      
-      const signerAddress = await signer.getAddress();
+      try {
+        const profile = await ProfileContract.deploy(signer, data.name, chainId);
+        dispatch(loadUserProfileData(profile.address, chainId, provider));
 
-      const res = await createProfile({name: data.name, ownerAddress: signerAddress, chainId: chainId.toString(), contractAddress: profile.address, transactionHash: profile.transactionHash as string});
+        const signerAddress = await signer.getAddress();
 
-      console.log('res', res);
-      
-      console.log('done.'); 
-      complete();
-      setLoadingSpinner(false);
+        const res = await createProfile({name: data.name, ownerAddress: signerAddress, chainId: chainId.toString(), contractAddress: profile.address, transactionHash: profile.transactionHash as string});
+
+        console.log('res', res);
+
+        console.log('done.');
+        complete();
+        setLoadingSpinner(false);
+      } catch (e) {
+        setLoadingSpinner(false);
+      }
     } else {
       console.log('no signer??');
     }

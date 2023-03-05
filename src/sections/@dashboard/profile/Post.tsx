@@ -53,7 +53,7 @@ export function Post({post} : PostProps) {
                 </Typography>
                 {profile?.lens  && (
                     <Stack direction="row">
-                    <Button onClick={followOnLens} disabled={!following}>
+                    <Button onClick={followOnLens} disabled={following}>
                         {followPending ?
                          "Loading..."
                         :

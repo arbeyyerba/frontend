@@ -92,14 +92,19 @@ export class ProfileContract {
   }
 
   async getAllAuthorizers(signer: Provider): Promise<Authorizer[]> {
-    const addresses = await this.contract.connect(signer).getAuthorizerList();
-    console.log('authorizers:', addresses);
-    return addresses.map((address: string) => {
-      return {
-        address,
-        description: 'unknown authorizer',
-      }
-    });
+    try {
+      const addresses = await this.contract.connect(signer).getAuthorizerList();
+      console.log('authorizers:', addresses);
+      return addresses.map((address: string) => {
+        return {
+          address,
+          description: 'unknown authorizer',
+        }
+      });
+    } catch (e) {
+      console.log('error getting authorizers', e);
+      return [];
+    }
   }
 
   async isValidMessages(provider: Provider, address: string, messages: Attestation[]): Promise<boolean> {
@@ -115,58 +120,68 @@ export class ProfileContract {
 
 
   async fetchMetadata(provider: Provider): Promise<any> {
-    const connectedContract = this.contract.connect(provider);
-    const metadataUri: string = await connectedContract.getMetadataUri();
-    console.log('metadata');
-    if (metadataUri.startsWith('data:application/json;base64,')) {
-      const jsonBlob = atob(metadataUri.substring(29));
-      console.log('json', jsonBlob);
-      return JSON.parse(jsonBlob);
-    } else {
-      return await fetch(metadataUri);
+    try {
+      const connectedContract = this.contract.connect(provider);
+      const metadataUri: string = await connectedContract.getMetadataUri();
+      console.log('metadata');
+      if (metadataUri.startsWith('data:application/json;base64,')) {
+        const jsonBlob = atob(metadataUri.substring(29));
+        console.log('json', jsonBlob);
+        return JSON.parse(jsonBlob);
+      } else {
+        return await fetch(metadataUri);
+      }
+    } catch (e) {
+      console.log('error fetching metadata', e);
+      return {};
     }
   }
 
   async getAllAttestations(provider: Provider): Promise<Record<string, Attestation[]>> {
-    //const id = await this.contract
-    const connectedContract = this.contract.connect(provider);
-    const authorizers = await connectedContract.getAuthorizerList();
-    console.log('attestation authorizers:', authorizers);
-    const attestations = await Promise.all(authorizers.map(async (address: string) => {
-      const bigNumLength = await connectedContract.postLengthByAuthorizer(address)
-      const length: number = ethers.BigNumber.from(bigNumLength).toNumber();
-      console.log('length:', length);
-      const rawMessages: [string, string][] = await Promise.all(Array(length).fill(0).map(async (_, index)=>{
-        return await connectedContract.postByAuthorizerAndIndex(address, index) as [string, string];
+    try {
+      //const id = await this.contract
+      const connectedContract = this.contract.connect(provider);
+      const authorizers = await connectedContract.getAuthorizerList();
+      console.log('attestation authorizers:', authorizers);
+      const attestations = await Promise.all(authorizers.map(async (address: string) => {
+        const bigNumLength = await connectedContract.postLengthByAuthorizer(address)
+        const length: number = ethers.BigNumber.from(bigNumLength).toNumber();
+        console.log('length:', length);
+        const rawMessages: [string, string][] = await Promise.all(Array(length).fill(0).map(async (_, index)=>{
+          return await connectedContract.postByAuthorizerAndIndex(address, index) as [string, string];
+        }));
+        console.log('messages', rawMessages);
+        const messages: Attestation[] = rawMessages.map(([sender, message]: [string, string], index) => {
+          let deleted = false;
+        console.log('sender / contract addr', sender, this.contract.address);
+          if (sender == this.contract.address) {
+            deleted = true
+          }
+          return {
+            id: index,
+            message,
+            senderAddress: sender,
+            authorizerAddress: address,
+            deleted,
+          }
+        })
+
+        return [address, messages]
       }));
-      console.log('messages', rawMessages);
-      const messages: Attestation[] = rawMessages.map(([sender, message]: [string, string], index) => {
-        let deleted = false;
-      console.log('sender / contract addr', sender, this.contract.address);
-        if (sender == this.contract.address) {
-          deleted = true
-        }
-        return {
-          id: index,
-          message,
-          senderAddress: sender,
-          authorizerAddress: address,
-          deleted,
-        }
+      console.log('attestations', attestations);
+
+      const attestationRecords: Record<string, Attestation[]> = {}
+      attestations.forEach(([address, messages]: [string, Attestation[]]) => {
+        attestationRecords[address] = messages
       })
-
-      return [address, messages]
-    }));
-    console.log('attestations', attestations);
-
-    const attestationRecords: Record<string, Attestation[]> = {}
-    attestations.forEach(([address, messages]: [string, Attestation[]]) => {
-      attestationRecords[address] = messages
-    })
-    return attestationRecords;
-    // TODO this should work??
-    // return attestations.reduce((record, [address, messages]) => {
-    //   record[address] = messages
-    // }, {});
+      return attestationRecords;
+      // TODO this should work??
+      // return attestations.reduce((record, [address, messages]) => {
+      //   record[address] = messages
+      // }, {});
+    } catch (e) {
+      console.log('error getting attestations', e);
+      return {}
+    }
   }
 }

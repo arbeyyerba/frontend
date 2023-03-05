@@ -19,8 +19,8 @@ export function Post({post} : PostProps) {
     const [following, setFollowing] = useState(false);
 
     const profile = knownProfiles[post?.senderAddress];
-    const name = profile?.name || post?.senderAddress;
-    const link = profile.lens ? `https://lenster.xyz/u/${name}` : `https://polygonscan.com/address/${post.senderAddress}`
+    const name = profile?.name || post?.senderAddress || '';
+    const link = profile?.lens ? `https://lenster.xyz/u/${name}` : `https://polygonscan.com/address/${post.senderAddress}`
 
     /* const avatar = profile?.avatar; */
 

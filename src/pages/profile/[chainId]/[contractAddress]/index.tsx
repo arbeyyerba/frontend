@@ -27,10 +27,10 @@ export default function ProfilePage() {
   console.log('signer status', signer, isError, isLoading, status, isIdle);
     /* const profileContract = useUserProfileContract(); */
     /* const contract = profileContract?.contract; */
-  const profile = useSelector((state) => state.contracts.userProfile);
+  const profile = useSelector((state) => state?.contracts?.userProfile);
   const router = useRouter();
-  const chainId = router.query.chainId;
-  const contractAddress = router.query.contractAddress as string;
+  const chainId = router?.query?.chainId;
+  const contractAddress = router.query?.contractAddress as string;
 
   useEffect(() => {
   if (chainId && contractAddress && provider) {
@@ -56,7 +56,7 @@ export default function ProfilePage() {
         <ProfileHeader />
 
           <Container maxWidth="xl">
-            {profile && profile.authorizers.length > 0 && (
+            {profile && profile.authorizers && profile.authorizers.length > 0 && (
               <>
                 <MakePost />
               <Grid item xs={12} sm={12} md={12}>
@@ -65,7 +65,7 @@ export default function ProfilePage() {
               </>
             )}
             <Typography variant='h3' align='center' color="secondary">
-              {profile && profile.authorizers.length == 0 ?
+              {profile && profile.authorizers && profile.authorizers.length == 0 ?
                 "Join a group to get started"
               :
                 "More groups to join"

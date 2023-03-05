@@ -27,8 +27,8 @@ export class LensContract {
       }
 
       return {
-        handle,
-        avatar: json?.cover,
+        handle: json.name || handle,
+        avatar: json.image,
       };
     } else {
       return undefined;
@@ -39,7 +39,7 @@ export class LensContract {
     const connectedLensContract = lensContract.connect(signer);
     const profileId = await connectedLensContract.defaultProfile(address);
     if (profileId) {
-      await connectedLensContract.follow([profileId], "Let's be friends!");
+      await connectedLensContract.follow([profileId], "Thanks for endorsing me on Abrey!");
     } else {
       return undefined;
     }

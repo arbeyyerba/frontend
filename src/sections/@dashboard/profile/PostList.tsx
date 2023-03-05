@@ -1,6 +1,8 @@
 // social media posts on my profile
 import { Grid, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import useUserProfileContractState from 'src/hooks/useUserProfileContractState';
+import useWalletAddress from 'src/hooks/useWallet';
 import { useSelector } from 'src/redux/store';
 import { AuthorizerCard } from '../authorizers';
 import { Post } from './Post';
@@ -10,6 +12,9 @@ export function PostList() {
     /* interface Posts {
 *     authorizer: string, posts: string[]
 * } */
+    const profileContractState = useUserProfileContractState();
+    const walletAddress = useWalletAddress();
+    const isOwner = walletAddress && walletAddress.toLowerCase() == profileContractState?.ownerAddress?.toLowerCase();
 
     const profile = useSelector((state) => state.contracts.userProfile);
 
@@ -20,7 +25,11 @@ export function PostList() {
      <>
          <Box sx={{p: '2em', paddingTop: '5em'}}>
         <Typography variant="h2" align='center' color='secondary'>
-            Posts on your profile
+            { isOwner ?
+            "Posts on your profile"
+            :
+            "Posts on this profile"
+            }
         </Typography>
          </Box>
         {profile && profile.authorizers.map((authorizer) => (

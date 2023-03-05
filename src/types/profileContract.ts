@@ -73,7 +73,7 @@ export class ProfileContract {
   }
 
   async getOwner(provider: Provider): Promise<string> {
-    const owner = await this.contract.connect(provider).getOwner();
+    const owner = await this.contract.connect(provider).profileOwner();
     console.log('owner', owner);
     return owner;
   }

@@ -39,7 +39,7 @@ export class LensContract {
     const connectedLensContract = lensContract.connect(signer);
     const profileId = await connectedLensContract.defaultProfile(address);
     if (profileId) {
-      await connectedLensContract.follow([profileId], "Thanks for endorsing me on Abrey!");
+      await connectedLensContract.follow([profileId], []);
     } else {
       return undefined;
     }

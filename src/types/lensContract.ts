@@ -17,10 +17,18 @@ export class LensContract {
     const profileId = await connectedLensContract.defaultProfile(address);
     if (profileId) {
       const handle = await connectedLensContract.getHandle(profileId);
-      const avatar = await connectedLensContract.tokenUri(profileId);
+      const uri = await connectedLensContract.tokenURI(profileId);
+      console.log('metadata');
+      let json;
+      if (uri.startsWith('data:application/json;base64,')) {
+        const jsonBlob = atob(uri.substring(29));
+        console.log('json', jsonBlob);
+        json = JSON.parse(jsonBlob);
+      }
+
       return {
         handle,
-        avatar,
+        avatar: json?.cover,
       };
     } else {
       return undefined;

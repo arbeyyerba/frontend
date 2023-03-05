@@ -1,6 +1,7 @@
 // social media posts on my profile
 import { Card, Link, Stack, Typography, Button } from '@mui/material';
 import { Box } from '@mui/system';
+import { useState } from 'react';
 import useKnownProfiles from 'src/hooks/useKnownProfiles';
 import { Attestation } from 'src/redux/slices/contracts';
 import { LensContract } from 'src/types/lensContract';
@@ -14,6 +15,8 @@ export interface PostProps {
 export function Post({post} : PostProps) {
   const { data: signer } = useSigner();
     const knownProfiles = useKnownProfiles();
+    const [followPending, setFollowPending] = useState(false);
+    const [following, setFollowing] = useState(false);
 
     const profile = knownProfiles[post?.senderAddress];
     const name = profile?.name || post?.senderAddress;
@@ -24,9 +27,12 @@ export function Post({post} : PostProps) {
 *     console.log('NYI');
 * } */
 
-    const followOnLens = () => {
+    const followOnLens = async () => {
         if (signer) {
-            LensContract.followOnLens(signer, post.senderAddress)
+            setFollowPending(true);
+            await LensContract.followOnLens(signer, post.senderAddress)
+            setFollowing(true);
+            setFollowPending(false);
         } else {
             console.log('no signer??', signer);
         }
@@ -47,8 +53,15 @@ export function Post({post} : PostProps) {
                 </Typography>
                 {profile?.lens  && (
                     <Stack direction="row">
-                    <Button onClick={followOnLens}>
-                        Follow on Lens
+                    <Button onClick={followOnLens} disabled={!following}>
+                        {followPending ?
+                         "Loading..."
+                        :
+                         following ?
+                         "You are already following"
+                         :
+                         "Follow on Lens"
+                        }
                     </Button>
                     </Stack>
                 )

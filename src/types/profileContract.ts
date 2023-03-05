@@ -72,6 +72,12 @@ export class ProfileContract {
     return canAttest;
   }
 
+  async getOwner(provider: Provider): Promise<string> {
+    const owner = await this.contract.connect(provider).getOwner();
+    console.log('owner', owner);
+    return owner;
+  }
+
   async addAuthorizer(signer: Signer, address: string): Promise<void> {
     const txn = await this.contract.connect(signer).addAuthorizer(address);
     await txn.wait(1);

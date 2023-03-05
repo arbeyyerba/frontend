@@ -11,6 +11,7 @@ import { dispatch } from 'src/redux/store';
 import { addAuthorizerAddressToProfile, removeAuthorizerAddressFromProfile} from 'src/redux/slices/contracts';
 import useUserProfileContract from 'src/hooks/useUserProfileContract';
 import { useRouter } from 'next/router';
+import useWalletAddress from 'src/hooks/useWallet';
 
 // ----------------------------------------------------------------------
 
@@ -44,6 +45,8 @@ export default  function AuthorizerCard({ authorizer, onComplete, leave }) {
   const profileContract = useUserProfileContract();
   const router = useRouter();
   const chainId = router.query.chainId;
+  const walletAddress = useWalletAddress();
+  const isOwner = walletAddress.toLowerCase() == profileContractState?.ownerAddress?.toLowerCase();
 
   const addAuthorizer = async () => {
     setLoadingSpinner(true);
@@ -88,7 +91,7 @@ export default  function AuthorizerCard({ authorizer, onComplete, leave }) {
             {name}
           </Typography>
         </Link>
-        {onComplete && (currentAuthorizers.find(currentAuthorizer => currentAuthorizer.address.toLocaleLowerCase() === address.toLocaleLowerCase()) ?
+        {isOwner && onComplete && (currentAuthorizers.find(currentAuthorizer => currentAuthorizer.address.toLocaleLowerCase() === address.toLocaleLowerCase()) ?
                         leave ? (
             <Button variant="contained" color="error" size="large" onClick={removeAuthorizer} >
               Leave Group

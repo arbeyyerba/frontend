@@ -54,6 +54,8 @@ interface SetupSectionProps {
 export default function DemoPage() {
   const [completed, setCompleted] = useState(steps.map(()=>false));
   const [currentStep, setCurrentStep] = useState(0);
+  // I only want to reroute if the *first* load from the db returns a profile...
+  const [firstDbLoad, setFirstDbLoad] = useState(true);
   const provider = useProvider();
   const router = useRouter();
 
@@ -71,8 +73,11 @@ export default function DemoPage() {
 
   useEffect(() => {
     console.log('checking if we can reroute');
-    if (profileLoaded && profile) {
+    if (profileLoaded && profile && firstDbLoad) {
           router.push(`/profile/${chainId}/${profile.address}`);
+    }
+    if (profileLoaded) {
+      setFirstDbLoad(false);
     }
   }, [profileLoaded])
 

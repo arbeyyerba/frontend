@@ -59,7 +59,7 @@ const authorizersMock: Record<number, AuthorizerContract[]> = {
       description: 'Whales only!',
     },
     {
-      address: '0xb3C3aa3Ea5db8bCaB931D60EF7824214e034279b',
+      address: '0x2B8E61402d1Dc32827fF3822b0F5Af023Ee0CCCC',
       chainId: '137',
       name: 'Lens',
       avatar: '/assets/images/contractImages/contract_4.png',
